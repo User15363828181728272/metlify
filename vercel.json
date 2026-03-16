@@ -1,0 +1,18 @@
+{
+    "version": 2,
+    "builds": [
+        { "src": "api/*.js",            "use": "@vercel/node", "config": { "maxDuration": 60 } },
+        { "src": "public/*.{html,css,js}", "use": "@vercel/static" }
+    ],
+    "routes": [
+        { "src": "/api/deploy", "dest": "/api/deploy.js"     },
+        { "src": "/api/clone",  "dest": "/api/clone.js"      },
+        { "src": "/api/rating", "dest": "/api/rating.js"     },
+        { "src": "/api/status", "dest": "/api/status.js"     },
+        { "src": "/docs",       "dest": "/public/docs.html"  },
+        { "src": "/style.css",  "dest": "/public/style.css"  },
+        { "src": "/app.js",     "dest": "/public/app.js"     },
+        { "src": "/(.*)",       "dest": "/public/index.html" }
+    ],
+    "alias": ["soraa.depstore.my.id"]
+}
