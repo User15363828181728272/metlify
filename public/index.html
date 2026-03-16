@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Soraa deployment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+<div class="star-field" id="stars"></div>
+
+<div class="app">
+
+    <div class="logo-wrap">
+        <svg class="logo" width="110" height="110" viewBox="0 0 120 120" fill="none">
+            <defs>
+                <radialGradient id="gC" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#c4b5fd"/>
+                    <stop offset="100%" stop-color="#7c6ef7"/>
+                </radialGradient>
+                <radialGradient id="gO" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#7c6ef7" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#7c6ef7" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="60" cy="60" r="58" fill="url(#gO)"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(124,110,247,0.18)" stroke-width="0.8" stroke-dasharray="3 4"/>
+            <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(124,110,247,0.28)" stroke-width="0.8" stroke-dasharray="5 3"/>
+            <circle cx="60" cy="60" r="30" fill="none" stroke="rgba(124,110,247,0.38)" stroke-width="0.8"/>
+            <circle cx="60" cy="60" r="18" fill="url(#gC)"/>
+            <circle cx="60" cy="60" r="8"  fill="#09090f"/>
+            <path d="M60 6L67 25L60 20L53 25Z"     fill="#7c6ef7"/>
+            <path d="M60 114L53 95L60 100L67 95Z"   fill="#7c6ef7"/>
+            <path d="M6 60L25 53L20 60L25 67Z"      fill="#7c6ef7"/>
+            <path d="M114 60L95 67L100 60L95 53Z"   fill="#7c6ef7"/>
+            <circle cx="60"  cy="14"  r="3.5" fill="#c4b5fd"/>
+            <circle cx="60"  cy="106" r="3.5" fill="#c4b5fd"/>
+            <circle cx="14"  cy="60"  r="3.5" fill="#c4b5fd"/>
+            <circle cx="106" cy="60"  r="3.5" fill="#c4b5fd"/>
+            <circle cx="21"  cy="21"  r="2"   fill="#7c6ef7" opacity="0.55"/>
+            <circle cx="99"  cy="21"  r="2"   fill="#7c6ef7" opacity="0.55"/>
+            <circle cx="21"  cy="99"  r="2"   fill="#7c6ef7" opacity="0.55"/>
+            <circle cx="99"  cy="99"  r="2"   fill="#7c6ef7" opacity="0.55"/>
+        </svg>
+    </div>
+
+    <div class="tagline">Web Automation Tool</div>
+    <div class="brand">Soraa deployment</div>
+
+    <div class="pills">
+        <span class="pill">Deploy</span>
+        <span class="pill">Clone</span>
+        <span class="pill">Netlify</span>
+        <span class="pill">Free</span>
+    </div>
+
+    <a class="join-banner" href="https://t.me/depstore11" target="_blank" rel="noopener">
+        <div class="join-dot"></div>
+        <div class="join-text">
+            <div class="join-title">Wajib Join Channel</div>
+            <div class="join-sub">@depstore11 — Update &amp; info terbaru</div>
+        </div>
+        <div class="join-arrow">&#8599;</div>
+    </a>
+
+    <div class="card" id="card-deploy">
+        <div class="card-header" onclick="toggle('card-deploy')">
+            <div class="icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <div class="card-info">
+                <div class="card-title">Deploy Web</div>
+                <div class="card-desc">Upload ZIP lalu deploy ke Netlify</div>
+            </div>
+            <div class="card-chevron">&#x2303;</div>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <div class="loading-box" id="loading-deploy">
+                    <div class="orbit">
+                        <div class="or1"></div><div class="or2"></div>
+                        <div class="or3"></div><div class="orDot"></div>
+                    </div>
+                    <div class="load-label" id="load-deploy-label">Deploying...</div>
+                    <div class="step-list">
+                        <div class="sitem" id="sd0">Validasi input</div>
+                        <div class="sitem" id="sd1">Upload file</div>
+                        <div class="sitem" id="sd2">Ekstrak ZIP</div>
+                        <div class="sitem" id="sd3">Deploy ke Surge</div>
+                    </div>
+                </div>
+                <label>Subdomain</label>
+                <input type="text" id="deploy-domain" placeholder="namaweb (nama site netlify)"/>
+                <label>File ZIP</label>
+                <input type="file" id="deploy-file" accept=".zip"/>
+                <button class="btn" id="btn-deploy" onclick="startDeploy()">Deploy Sekarang</button>
+                <div class="result-box" id="result-deploy">
+                    <div class="res-label">Live URL</div>
+                    <a class="res-url" id="res-deploy-url" href="#" target="_blank"></a>
+                </div>
+                <div class="error-box" id="error-deploy"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="card-clone">
+        <div class="card-header" onclick="toggle('card-clone')">
+            <div class="icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/>
+                    <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
+                    <path d="M11 18H8a2 2 0 0 1-2-2V9"/>
+                </svg>
+            </div>
+            <div class="card-info">
+                <div class="card-title">Clone Web</div>
+                <div class="card-desc">Crawl &amp; download source website</div>
+            </div>
+            <div class="card-chevron">&#x2303;</div>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <div class="loading-box" id="loading-clone">
+                    <div class="orbit">
+                        <div class="or1"></div><div class="or2"></div>
+                        <div class="or3"></div><div class="orDot"></div>
+                    </div>
+                    <div class="load-label">Cloning...</div>
+                    <div class="step-list">
+                        <div class="sitem" id="sc0">Koneksi ke server</div>
+                        <div class="sitem" id="sc1">Crawling halaman</div>
+                        <div class="sitem" id="sc2">Download assets</div>
+                        <div class="sitem" id="sc3">Packing ZIP</div>
+                    </div>
+                </div>
+                <label>URL Website</label>
+                <input type="text" id="clone-url" placeholder="https://example.com"/>
+                <button class="btn" id="btn-clone" onclick="startClone()">Get Source Code</button>
+                <div class="result-box" id="result-clone">
+                    <div class="res-label">Download ZIP</div>
+                    <a class="res-url" id="res-clone-url" href="#" download>Klik untuk download</a>
+                    <div class="res-info" id="res-clone-info"></div>
+                </div>
+                <div class="error-box" id="error-clone"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="card-status">
+        <div class="card-header" onclick="toggleStatus()">
+            <div class="icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+            </div>
+            <div class="card-info">
+                <div class="card-title">Status Server</div>
+                <div class="card-desc">Cek statistik &amp; runtime</div>
+            </div>
+            <div class="card-chevron">&#x2303;</div>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <div class="status-grid">
+                    <div class="stat-card"><div class="stat-val" id="sv-deploy">0</div><div class="stat-key">Total Deploy</div></div>
+                    <div class="stat-card"><div class="stat-val" id="sv-clone">0</div><div class="stat-key">Total Clone</div></div>
+                    <div class="stat-card"><div class="stat-val" id="sv-rating">0</div><div class="stat-key">Total Rating</div></div>
+                    <div class="stat-card"><div class="stat-val" id="sv-online" style="color:#4ade80">Online</div><div class="stat-key">API Status</div></div>
+                </div>
+                <div class="runtime-box">
+                    <span class="runtime-label">Session Runtime</span>
+                    <span class="runtime-val" id="runtime-val">0j 0m 0d</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="card-rating">
+        <div class="card-header" onclick="toggle('card-rating')">
+            <div class="icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+            </div>
+            <div class="card-info">
+                <div class="card-title">Rating Layanan</div>
+                <div class="card-desc">Kirim testimoni ke channel Telegram</div>
+            </div>
+            <div class="card-chevron">&#x2303;</div>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <label>Nama Kamu</label>
+                <input type="text" id="rating-name" placeholder="Nama atau username"/>
+                <label>Pilih Rating</label>
+                <div class="rating-row">
+                    <div class="star-btn" onclick="selectRating(1)">&#9733;</div>
+                    <div class="star-btn" onclick="selectRating(2)">&#9733;&#9733;</div>
+                    <div class="star-btn" onclick="selectRating(3)">&#9733;&#9733;&#9733;</div>
+                    <div class="star-btn" onclick="selectRating(4)">&#9733;&#9733;&#9733;&#9733;</div>
+                    <div class="star-btn" onclick="selectRating(5)">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                </div>
+                <div class="stars-display" id="stars-display">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <label>Testimoni</label>
+                <textarea id="feedback" placeholder="Ceritakan pengalamanmu..."></textarea>
+                <button class="btn" id="btn-rating" onclick="submitRating()">Kirim Rating</button>
+                <div class="result-box" id="result-rating">
+                    <div class="res-label">Rating terkirim ke channel Telegram!</div>
+                </div>
+                <div class="error-box" id="error-rating"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="/docs">API Docs</a>
+        &nbsp;&mdash;&nbsp;
+        Made with <span style="color:#a78bfa">&#9829;</span> by
+        <a href="https://t.me/depstore11" target="_blank">@depstore11</a>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>
