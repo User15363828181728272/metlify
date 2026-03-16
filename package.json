@@ -1,0 +1,17 @@
+{
+    "name": "soraa-deployer",
+    "version": "2.0.0",
+    "scripts": {
+        "dev": "vercel dev",
+        "start": "vercel --prod"
+    },
+    "dependencies": {
+        "adm-zip": "^0.5.10",
+        "axios": "^1.6.7",
+        "busboy": "^1.6.0",
+        "cheerio": "^1.0.0-rc.12"
+    },
+    "engines": {
+        "node": "24.x"
+    }
+}
