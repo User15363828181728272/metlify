@@ -1,380 +1,386 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Soraa API Docs</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-    --bg: #09090f; --surface: #111118; --surface2: #1a1a24;
-    --accent: #7c6ef7; --accent2: #a78bfa; --accent3: #c4b5fd;
-    --text: #f0eeff; --muted: #8b8aa8; --border: rgba(124,110,247,0.15);
-    --green: #4ade80; --red: #f87171; --yellow: #fbbf24; --blue: #60a5fa;
-    --mono: 'JetBrains Mono', monospace;
-}
-html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; }
-
-.star-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite alternate; }
-@keyframes twinkle { 0% { opacity: .08; } 100% { opacity: .5; } }
-
-.wrap { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
-
-.header { text-align: center; margin-bottom: 44px; animation: fadeUp .8s both; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-.logo-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
-.logo-icon { width: 40px; height: 40px; filter: drop-shadow(0 0 12px rgba(124,110,247,.5)); }
-.brand { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; background: linear-gradient(135deg, var(--accent3), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.header-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.base-url { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 14px; font-family: var(--mono); font-size: 12px; color: var(--accent2); margin-top: 10px; }
-
-.auth-box { background: rgba(124,110,247,.07); border: 1px solid rgba(124,110,247,.25); border-radius: 14px; padding: 16px 18px; margin-bottom: 24px; animation: fadeUp .8s .1s both; }
-.auth-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--accent2); margin-bottom: 6px; }
-.auth-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
-.auth-tags { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-family: var(--mono); font-size: 11px; font-weight: 500; }
-.tag-h { background: rgba(96,165,250,.1); color: var(--blue); border: 1px solid rgba(96,165,250,.2); }
-.tag-k { background: rgba(124,110,247,.1); color: var(--accent2); border: 1px solid rgba(124,110,247,.2); }
-
-.lang-bar { display: flex; gap: 6px; margin-bottom: 20px; animation: fadeUp .8s .08s both; flex-wrap: wrap; }
-.lang-btn { padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); color: var(--muted); background: transparent; transition: all .2s; font-family: 'Space Grotesk', sans-serif; }
-.lang-btn.active { background: rgba(124,110,247,.15); border-color: var(--accent); color: var(--accent2); }
-
-.ep { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; animation: fadeUp .8s both; }
-.ep:nth-child(1) { animation-delay: .15s; }
-.ep:nth-child(2) { animation-delay: .22s; }
-.ep:nth-child(3) { animation-delay: .29s; }
-.ep:nth-child(4) { animation-delay: .36s; }
-
-.ep-header { padding: 14px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background .2s; user-select: none; }
-.ep-header:hover { background: rgba(124,110,247,.05); }
-.method { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 5px; flex-shrink: 0; }
-.POST { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.2); }
-.GET  { background: rgba(96,165,250,.1); color: var(--blue); border: 1px solid rgba(96,165,250,.2); }
-.ep-path { font-family: var(--mono); font-size: 13px; color: var(--text); font-weight: 500; }
-.ep-desc { font-size: 11px; color: var(--muted); margin-left: auto; }
-.ep-chev { color: var(--muted); transition: transform .3s; font-size: 16px; flex-shrink: 0; }
-.ep.open .ep-chev { transform: rotate(180deg); }
-.ep-body { max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.16,1,.3,1); }
-.ep.open .ep-body { max-height: 1400px; }
-.ep-inner { padding: 0 18px 18px; border-top: 1px solid var(--border); }
-
-.slabel { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin: 14px 0 7px; }
-
-.params { width: 100%; border-collapse: collapse; font-size: 12px; }
-.params th { text-align: left; color: var(--muted); font-weight: 600; padding: 5px 8px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: .5px; text-transform: uppercase; }
-.params td { padding: 7px 8px; border-bottom: 1px solid rgba(124,110,247,.06); vertical-align: top; }
-.params tr:last-child td { border-bottom: none; }
-.pname { font-family: var(--mono); color: var(--accent2); font-size: 11px; }
-.ptype { font-family: var(--mono); color: var(--muted); font-size: 10px; }
-.preq  { color: var(--red); font-size: 10px; font-weight: 600; }
-.pdesc { color: var(--text); font-size: 12px; line-height: 1.5; }
-
-.code-wrap { position: relative; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 6px 0; display: none; }
-.code-wrap.active { display: block; }
-.code-wrap.always { display: block; }
-.code-lang { position: absolute; top: 8px; right: 40px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
-.code-copy { position: absolute; top: 6px; right: 8px; background: rgba(124,110,247,.12); border: 1px solid rgba(124,110,247,.2); border-radius: 5px; padding: 3px 8px; font-size: 10px; color: var(--accent2); cursor: pointer; font-family: 'Space Grotesk', sans-serif; transition: all .2s; }
-.code-copy:hover { background: rgba(124,110,247,.25); }
-pre { padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--text); }
-.kw  { color: var(--accent2); }
-.str { color: var(--green); }
-.key { color: var(--blue); }
-.num { color: var(--yellow); }
-.cm  { color: var(--muted); }
-
-.res-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
-.sbadge  { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 5px; font-weight: 500; }
-.s200 { background: rgba(74,222,128,.1); color: var(--green); }
-.s400 { background: rgba(251,191,36,.1); color: var(--yellow); }
-.s401 { background: rgba(248,113,113,.1); color: var(--red); }
-.s500 { background: rgba(248,113,113,.1); color: var(--red); }
-.res-desc { font-size: 11px; color: var(--muted); }
-
-.footer { text-align: center; margin-top: 44px; font-size: 11px; color: var(--muted); }
-.footer a { color: var(--accent2); text-decoration: none; }
-</style>
+<title>Soraa Deployment</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
 
-<div class="star-field" id="stars"></div>
+<div id="stars"></div>
 
-<div class="wrap">
+<button id="ham" onclick="toggleDrawer()">
+  <i id="ham-ico" class="fas fa-bars"></i>
+</button>
 
-    <div class="header">
-        <div class="logo-row">
-            <svg class="logo-icon" viewBox="0 0 120 120" fill="none">
-                <defs>
-                    <radialGradient id="gc2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#7c6ef7"/></radialGradient>
-                    <radialGradient id="go2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7c6ef7" stop-opacity="0.25"/><stop offset="100%" stop-color="#7c6ef7" stop-opacity="0"/></radialGradient>
-                </defs>
-                <circle cx="60" cy="60" r="58" fill="url(#go2)"/>
-                <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(124,110,247,0.28)" stroke-width="0.8" stroke-dasharray="5 3"/>
-                <circle cx="60" cy="60" r="18" fill="url(#gc2)"/>
-                <circle cx="60" cy="60" r="8" fill="#09090f"/>
-                <path d="M60 6L67 25L60 20L53 25Z" fill="#7c6ef7"/>
-                <path d="M60 114L53 95L60 100L67 95Z" fill="#7c6ef7"/>
-                <path d="M6 60L25 53L20 60L25 67Z" fill="#7c6ef7"/>
-                <path d="M114 60L95 67L100 60L95 53Z" fill="#7c6ef7"/>
-                <circle cx="60" cy="14" r="3" fill="#c4b5fd"/>
-                <circle cx="60" cy="106" r="3" fill="#c4b5fd"/>
-                <circle cx="14" cy="60" r="3" fill="#c4b5fd"/>
-                <circle cx="106" cy="60" r="3" fill="#c4b5fd"/>
-            </svg>
-            <div class="brand">Soraa API Docs</div>
-        </div>
-        <div class="header-sub">REST API — Deploy, Clone &amp; Rating — @depstore11</div>
-        <div class="base-url">https://soraa.depstore.my.id</div>
+<div id="overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="dr-header">
+    <div class="dr-brand"><i class="fas fa-satellite-dish" style="font-size:16px;margin-right:8px;color:var(--acc2)"></i>Soraa <span>deployment</span></div>
+    <div class="clock-box">
+      <div class="clk-time" id="clk">--:--:--</div>
+      <div class="clk-date" id="clkd">Memuat...</div>
+      <div class="clk-row"><div class="online-dot"></div><div class="clk-badge">WIB — UTC+7</div></div>
     </div>
-
-    <div class="auth-box">
-        <div class="auth-title">Autentikasi</div>
-        <div class="auth-desc">Semua endpoint kecuali /api/status membutuhkan API Key di header:</div>
-        <div class="auth-tags">
-            <span class="tag tag-h">X-API-Key: YOUR_KEY</span>
-            <span style="font-size:11px;color:var(--muted);align-self:center">atau</span>
-            <span class="tag tag-k">Authorization: Bearer YOUR_KEY</span>
-        </div>
+    <div class="wx-box">
+      <div class="wx-icon" id="wx-ico"><i class="fas fa-sun" style="color:#fbbf24;font-size:28px"></i></div>
+      <div>
+        <div id="wx-temp-area"><span class="wx-loading"><i class="fas fa-circle-notch fa-spin"></i> Memuat cuaca...</span></div>
+        <div class="wx-desc" id="wx-desc" style="display:none"></div>
+        <div class="wx-loc"><i class="fas fa-location-dot" style="font-size:9px;margin-right:3px"></i>Surabaya, Jawa Timur</div>
+      </div>
     </div>
-
-    <div class="lang-bar">
-        <button class="lang-btn active" onclick="setLang('php')">PHP</button>
-        <button class="lang-btn" onclick="setLang('curl')">cURL</button>
-        <button class="lang-btn" onclick="setLang('js')">JavaScript</button>
-        <button class="lang-btn" onclick="setLang('python')">Python</button>
+  </div>
+  <nav class="dr-nav">
+    <div class="dr-item active" onclick="goPage('home');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-house"></i></div>
+      <div><div class="dr-lbl">Beranda</div><div class="dr-sub">Info & panduan</div></div>
     </div>
-
-    <div class="ep open" id="ep-status">
-        <div class="ep-header" onclick="tog('ep-status')">
-            <span class="method GET">GET</span>
-            <span class="ep-path">/api/status</span>
-            <span class="ep-desc">Cek status server</span>
-            <span class="ep-chev">&#x2303;</span>
-        </div>
-        <div class="ep-body">
-            <div class="ep-inner">
-                <div class="slabel">Tidak membutuhkan API Key</div>
-                <div class="slabel">Contoh Request</div>
-                <div class="code-wrap lang-php active"><span class="code-lang">php</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>$res  = file_get_contents(<span class="str">'https://soraa.depstore.my.id/api/status'</span>);
-$data = json_decode($res, <span class="kw">true</span>);
-echo $data[<span class="str">'bot'</span>];</pre></div>
-                <div class="code-wrap lang-curl"><span class="code-lang">curl</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>curl https://soraa.depstore.my.id/api/status</pre></div>
-                <div class="code-wrap lang-js"><span class="code-lang">js</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">const</span> data = <span class="kw">await</span> (await fetch(<span class="str">'/api/status'</span>)).json();
-console.log(data.bot);</pre></div>
-                <div class="code-wrap lang-python"><span class="code-lang">python</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">import</span> requests
-data = requests.get(<span class="str">'https://soraa.depstore.my.id/api/status'</span>).json()
-print(data[<span class="str">'bot'</span>])</pre></div>
-                <div class="slabel">Response 200</div>
-                <div class="code-wrap always"><button class="code-copy" onclick="cp(this)">Copy</button><pre>{
-  <span class="key">"ok"</span>:      <span class="kw">true</span>,
-  <span class="key">"bot"</span>:     <span class="str">"Soraa.dev"</span>,
-  <span class="key">"owner"</span>:   <span class="str">"@KaodepstoreID"</span>,
-  <span class="key">"channel"</span>: <span class="str">"@depstore11"</span>,
-  <span class="key">"domain"</span>:  <span class="str">"soraa.depstore.my.id"</span>,
-  <span class="key">"deploy"</span>:  <span class="num">12</span>,
-  <span class="key">"clone"</span>:   <span class="num">7</span>,
-  <span class="key">"rating"</span>:  <span class="num">5</span>,
-  <span class="key">"uptime"</span>:  <span class="num">3600</span>
-}</pre></div>
-            </div>
-        </div>
+    <div class="dr-item" onclick="goPage('deploy');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-rocket"></i></div>
+      <div><div class="dr-lbl">Deploy Web</div><div class="dr-sub">ZIP ke Netlify</div></div>
+      <div class="dr-badge">FREE</div>
     </div>
-
-    <div class="ep" id="ep-deploy">
-        <div class="ep-header" onclick="tog('ep-deploy')">
-            <span class="method POST">POST</span>
-            <span class="ep-path">/api/deploy</span>
-            <span class="ep-desc">Deploy ZIP ke Surge.sh</span>
-            <span class="ep-chev">&#x2303;</span>
-        </div>
-        <div class="ep-body">
-            <div class="ep-inner">
-                <div class="slabel">Request — multipart/form-data</div>
-                <table class="params">
-                    <tr><th>Field</th><th>Type</th><th>Wajib</th><th>Keterangan</th></tr>
-                    <tr><td><span class="pname">domain</span></td><td><span class="ptype">string</span></td><td><span class="preq">Ya</span></td><td class="pdesc">Subdomain tanpa .surge.sh</td></tr>
-                    <tr><td><span class="pname">file</span></td><td><span class="ptype">file (.zip)</span></td><td><span class="preq">Ya</span></td><td class="pdesc">ZIP berisi file website</td></tr>
-                </table>
-                <div class="slabel">Contoh Request</div>
-                <div class="code-wrap lang-php active"><span class="code-lang">php</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>$ch = curl_init(<span class="str">'https://soraa.depstore.my.id/api/deploy'</span>);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_POST, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [<span class="str">'X-API-Key: YOUR_KEY'</span>]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, [
-    <span class="str">'domain'</span> => <span class="str">'namaweb'</span>,
-    <span class="str">'file'</span>   => <span class="kw">new</span> CURLFile(<span class="str">'/path/website.zip'</span>, <span class="str">'application/zip'</span>, <span class="str">'website.zip'</span>)
-]);
-$data = json_decode(curl_exec($ch), <span class="kw">true</span>);
-echo $data[<span class="str">'url'</span>];</pre></div>
-                <div class="code-wrap lang-curl"><span class="code-lang">curl</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>curl -X POST https://soraa.depstore.my.id/api/deploy \
-  -H <span class="str">"X-API-Key: YOUR_KEY"</span> \
-  -F <span class="str">"domain=namaweb"</span> \
-  -F <span class="str">"file=@/path/website.zip"</span></pre></div>
-                <div class="code-wrap lang-js"><span class="code-lang">js</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">const</span> form = <span class="kw">new</span> FormData();
-form.append(<span class="str">'domain'</span>, <span class="str">'namaweb'</span>);
-form.append(<span class="str">'file'</span>, zipBlob, <span class="str">'website.zip'</span>);
-<span class="kw">const</span> data = <span class="kw">await</span> (await fetch(<span class="str">'/api/deploy'</span>, {
-    method: <span class="str">'POST'</span>, headers: { <span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span> }, body: form
-})).json();
-console.log(data.url);</pre></div>
-                <div class="code-wrap lang-python"><span class="code-lang">python</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">import</span> requests
-<span class="kw">with</span> open(<span class="str">'/path/website.zip'</span>, <span class="str">'rb'</span>) <span class="kw">as</span> f:
-    r = requests.post(<span class="str">'https://soraa.depstore.my.id/api/deploy'</span>,
-        headers={<span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span>},
-        data={<span class="str">'domain'</span>: <span class="str">'namaweb'</span>},
-        files={<span class="str">'file'</span>: f})
-print(r.json()[<span class="str">'url'</span>])</pre></div>
-                <div class="slabel">Response</div>
-                <div class="res-row"><span class="sbadge s200">200</span><span class="res-desc">Deploy sukses</span></div>
-                <div class="code-wrap always"><button class="code-copy" onclick="cp(this)">Copy</button><pre>{ <span class="key">"ok"</span>: <span class="kw">true</span>, <span class="key">"url"</span>: <span class="str">"https://namaweb.surge.sh"</span>, <span class="key">"message"</span>: <span class="str">"Deploy sukses"</span> }</pre></div>
-                <div class="res-row"><span class="sbadge s401">401</span><span class="res-desc">API key salah</span></div>
-                <div class="res-row"><span class="sbadge s400">400</span><span class="res-desc">Field tidak lengkap</span></div>
-                <div class="res-row"><span class="sbadge s500">500</span><span class="res-desc">Surge error</span></div>
-            </div>
-        </div>
+    <div class="dr-item" onclick="goPage('clone');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-copy"></i></div>
+      <div><div class="dr-lbl">Clone Website</div><div class="dr-sub">Download source code</div></div>
+      <div class="dr-badge">FREE</div>
     </div>
-
-    <div class="ep" id="ep-clone">
-        <div class="ep-header" onclick="tog('ep-clone')">
-            <span class="method POST">POST</span>
-            <span class="ep-path">/api/clone</span>
-            <span class="ep-desc">Clone website ke ZIP</span>
-            <span class="ep-chev">&#x2303;</span>
-        </div>
-        <div class="ep-body">
-            <div class="ep-inner">
-                <div class="slabel">Request — application/json</div>
-                <table class="params">
-                    <tr><th>Field</th><th>Type</th><th>Wajib</th><th>Keterangan</th></tr>
-                    <tr><td><span class="pname">url</span></td><td><span class="ptype">string</span></td><td><span class="preq">Ya</span></td><td class="pdesc">URL website yang ingin di-clone</td></tr>
-                </table>
-                <div class="slabel">Contoh Request</div>
-                <div class="code-wrap lang-php active"><span class="code-lang">php</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>$ch = curl_init(<span class="str">'https://soraa.depstore.my.id/api/clone'</span>);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_POST, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    <span class="str">'Content-Type: application/json'</span>,
-    <span class="str">'X-API-Key: YOUR_KEY'</span>
-]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([<span class="str">'url'</span> => <span class="str">'https://example.com'</span>]));
-$zip = curl_exec($ch);
-file_put_contents(<span class="str">'clone.zip'</span>, $zip);</pre></div>
-                <div class="code-wrap lang-curl"><span class="code-lang">curl</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>curl -X POST https://soraa.depstore.my.id/api/clone \
-  -H <span class="str">"Content-Type: application/json"</span> \
-  -H <span class="str">"X-API-Key: YOUR_KEY"</span> \
-  -d <span class="str">'{"url":"https://example.com"}'</span> \
-  --output clone.zip</pre></div>
-                <div class="code-wrap lang-js"><span class="code-lang">js</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">const</span> res  = <span class="kw">await</span> fetch(<span class="str">'/api/clone'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>, <span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span> },
-    body: JSON.stringify({ url: <span class="str">'https://example.com'</span> })
-});
-<span class="kw">const</span> blob = <span class="kw">await</span> res.blob();
-<span class="kw">const</span> a = document.createElement(<span class="str">'a'</span>);
-a.href = URL.createObjectURL(blob);
-a.download = <span class="str">'clone.zip'</span>;
-a.click();</pre></div>
-                <div class="code-wrap lang-python"><span class="code-lang">python</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>r = requests.post(<span class="str">'https://soraa.depstore.my.id/api/clone'</span>,
-    headers={<span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span>},
-    json={<span class="str">'url'</span>: <span class="str">'https://example.com'</span>})
-<span class="kw">with</span> open(<span class="str">'clone.zip'</span>, <span class="str">'wb'</span>) <span class="kw">as</span> f:
-    f.write(r.content)</pre></div>
-                <div class="slabel">Response</div>
-                <div class="res-row"><span class="sbadge s200">200</span><span class="res-desc">Binary ZIP (application/zip)</span></div>
-                <div class="res-row"><span class="sbadge s401">401</span><span class="res-desc">API key salah</span></div>
-                <div class="res-row"><span class="sbadge s500">500</span><span class="res-desc">Crawl gagal</span></div>
-            </div>
-        </div>
+    <div class="dr-sep"></div>
+    <a class="dr-item" href="https://t.me/depstore11" target="_blank">
+      <div class="dr-ico"><i class="fab fa-telegram"></i></div>
+      <div><div class="dr-lbl">Telegram Channel</div><div class="dr-sub">@depstore11</div></div>
+    </a>
+    <div class="dr-item" onclick="goPage('status');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-chart-line"></i></div>
+      <div><div class="dr-lbl">Status & Statistik</div><div class="dr-sub">Pantau API</div></div>
     </div>
-
-    <div class="ep" id="ep-rating">
-        <div class="ep-header" onclick="tog('ep-rating')">
-            <span class="method POST">POST</span>
-            <span class="ep-path">/api/rating</span>
-            <span class="ep-desc">Kirim rating ke Telegram</span>
-            <span class="ep-chev">&#x2303;</span>
-        </div>
-        <div class="ep-body">
-            <div class="ep-inner">
-                <div class="slabel">Request — application/json</div>
-                <table class="params">
-                    <tr><th>Field</th><th>Type</th><th>Wajib</th><th>Keterangan</th></tr>
-                    <tr><td><span class="pname">name</span></td><td><span class="ptype">string</span></td><td><span class="preq">Ya</span></td><td class="pdesc">Nama pengirim</td></tr>
-                    <tr><td><span class="pname">rating</span></td><td><span class="ptype">number 1-5</span></td><td><span class="preq">Ya</span></td><td class="pdesc">Rating bintang</td></tr>
-                    <tr><td><span class="pname">message</span></td><td><span class="ptype">string</span></td><td><span class="preq">Ya</span></td><td class="pdesc">Isi testimoni</td></tr>
-                </table>
-                <div class="slabel">Contoh Request</div>
-                <div class="code-wrap lang-php active"><span class="code-lang">php</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>$ch = curl_init(<span class="str">'https://soraa.depstore.my.id/api/rating'</span>);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_POST, <span class="kw">true</span>);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    <span class="str">'Content-Type: application/json'</span>,
-    <span class="str">'X-API-Key: YOUR_KEY'</span>
-]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    <span class="str">'name'</span>    => <span class="str">'Budi'</span>,
-    <span class="str">'rating'</span>  => <span class="num">5</span>,
-    <span class="str">'message'</span> => <span class="str">'Keren banget!'</span>
-]));
-$data = json_decode(curl_exec($ch), <span class="kw">true</span>);
-echo $data[<span class="str">'message'</span>];</pre></div>
-                <div class="code-wrap lang-curl"><span class="code-lang">curl</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>curl -X POST https://soraa.depstore.my.id/api/rating \
-  -H <span class="str">"Content-Type: application/json"</span> \
-  -H <span class="str">"X-API-Key: YOUR_KEY"</span> \
-  -d <span class="str">'{"name":"Budi","rating":5,"message":"Keren!"}'</span></pre></div>
-                <div class="code-wrap lang-js"><span class="code-lang">js</span><button class="code-copy" onclick="cp(this)">Copy</button><pre><span class="kw">const</span> data = <span class="kw">await</span> (await fetch(<span class="str">'/api/rating'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>, <span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span> },
-    body: JSON.stringify({ name: <span class="str">'Budi'</span>, rating: <span class="num">5</span>, message: <span class="str">'Keren!'</span> })
-})).json();
-console.log(data.message);</pre></div>
-                <div class="code-wrap lang-python"><span class="code-lang">python</span><button class="code-copy" onclick="cp(this)">Copy</button><pre>r = requests.post(<span class="str">'https://soraa.depstore.my.id/api/rating'</span>,
-    headers={<span class="str">'X-API-Key'</span>: <span class="str">'YOUR_KEY'</span>},
-    json={<span class="str">'name'</span>: <span class="str">'Budi'</span>, <span class="str">'rating'</span>: <span class="num">5</span>, <span class="str">'message'</span>: <span class="str">'Keren!'</span>})
-print(r.json())</pre></div>
-                <div class="slabel">Response</div>
-                <div class="res-row"><span class="sbadge s200">200</span><span class="res-desc">Rating terkirim ke Telegram</span></div>
-                <div class="code-wrap always"><button class="code-copy" onclick="cp(this)">Copy</button><pre>{ <span class="key">"ok"</span>: <span class="kw">true</span>, <span class="key">"message"</span>: <span class="str">"Rating berhasil dikirim ke channel Telegram"</span> }</pre></div>
-                <div class="res-row"><span class="sbadge s401">401</span><span class="res-desc">API key salah</span></div>
-                <div class="res-row"><span class="sbadge s400">400</span><span class="res-desc">Field tidak lengkap</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <a href="/">Kembali ke App</a>
-        &nbsp;&mdash;&nbsp;
-        Soraa Deployer &mdash;
-        <a href="https://t.me/depstore11">@depstore11</a>
-    </div>
-
+  </nav>
 </div>
 
-<script>
-(function(){const sf=document.getElementById("stars");for(let i=0;i<50;i++){const s=document.createElement("div");s.className="star";const z=Math.random()*1.8+0.3;s.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;animation-delay:${-(Math.random()*6)}s`;sf.appendChild(s);}})();
+<div id="bot-nav">
+  <div class="bnav-item active" id="bn-home" onclick="goPage('home')">
+    <i class="fas fa-house bi"></i><span>Home</span>
+  </div>
+  <div class="bnav-item" id="bn-deploy" onclick="goPage('deploy')">
+    <i class="fas fa-rocket bi"></i><span>Deploy</span>
+  </div>
+  <div class="bnav-item" id="bn-clone" onclick="goPage('clone')">
+    <i class="fas fa-copy bi"></i><span>Clone</span>
+  </div>
+  <div class="bnav-item" id="bn-status" onclick="goPage('status')">
+    <i class="fas fa-chart-line bi"></i><span>Status</span>
+  </div>
+</div>
 
-function tog(id){ document.getElementById(id).classList.toggle("open"); }
+<div class="page active" id="pg-home">
+<div class="app">
+  <div class="hero">
+    <div class="logo-wrap">
+      <svg class="logo-glow" width="96" height="96" viewBox="0 0 120 120" fill="none">
+        <defs>
+          <radialGradient id="gC"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#7c6ef7"/></radialGradient>
+          <radialGradient id="gO"><stop offset="0%" stop-color="#7c6ef7" stop-opacity=".25"/><stop offset="100%" stop-color="#7c6ef7" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle cx="60" cy="60" r="58" fill="url(#gO)"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(124,110,247,.2)" stroke-width="1" stroke-dasharray="3 4"/>
+        <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(124,110,247,.3)" stroke-width="1" stroke-dasharray="5 3"/>
+        <circle cx="60" cy="60" r="30" fill="none" stroke="rgba(124,110,247,.4)" stroke-width="1"/>
+        <circle cx="60" cy="60" r="18" fill="url(#gC)"/>
+        <circle cx="60" cy="60" r="8" fill="#06060d"/>
+        <path d="M60 6L67 25L60 20L53 25Z" fill="#7c6ef7"/>
+        <path d="M60 114L53 95L60 100L67 95Z" fill="#7c6ef7"/>
+        <path d="M6 60L25 53L20 60L25 67Z" fill="#7c6ef7"/>
+        <path d="M114 60L95 67L100 60L95 53Z" fill="#7c6ef7"/>
+        <circle cx="60" cy="14" r="3.5" fill="#c4b5fd"/>
+        <circle cx="60" cy="106" r="3.5" fill="#c4b5fd"/>
+        <circle cx="14" cy="60" r="3.5" fill="#c4b5fd"/>
+        <circle cx="106" cy="60" r="3.5" fill="#c4b5fd"/>
+      </svg>
+    </div>
+    <div class="tagline">Web Automation Tool</div>
+    <div class="brand">Soraa deployment</div>
+    <p class="hero-desc">Deploy website kamu ke internet dalam hitungan detik. Upload ZIP, pilih subdomain, dan langsung live — gratis tanpa ribet.</p>
+    <div class="pills">
+      <span class="pill"><i class="fas fa-bolt" style="font-size:9px;margin-right:4px"></i>Deploy Instan</span>
+      <span class="pill"><i class="fas fa-copy" style="font-size:9px;margin-right:4px"></i>Clone Web</span>
+      <span class="pill"><i class="fas fa-gift" style="font-size:9px;margin-right:4px"></i>100% Gratis</span>
+      <span class="pill"><i class="fas fa-shield-halved" style="font-size:9px;margin-right:4px"></i>Aman</span>
+    </div>
+    <div class="cta-row">
+      <button class="btn-main" onclick="goPage('deploy')"><i class="fas fa-rocket"></i> Mulai Deploy</button>
+      <button class="btn-out" onclick="goPage('clone')"><i class="fas fa-copy"></i> Clone Website</button>
+    </div>
+  </div>
 
-let lang = "php";
-function setLang(l){
-    lang = l;
-    document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.textContent.toLowerCase() === l));
-    document.querySelectorAll(".code-wrap[class*='lang-']").forEach(el => {
-        el.classList.toggle("active", el.classList.contains("lang-" + l));
-    });
-}
+  <a class="join-banner" href="https://t.me/depstore11" target="_blank">
+    <div class="jdot"></div>
+    <div class="jtx"><div class="jt">Wajib Join Channel</div><div class="js"><i class="fab fa-telegram" style="font-size:10px;margin-right:3px"></i>@depstore11 — Update & info terbaru</div></div>
+    <i class="fas fa-arrow-up-right-from-square" style="font-size:14px;color:var(--acc2)"></i>
+  </a>
 
-function cp(btn){
-    const pre = btn.closest(".code-wrap").querySelector("pre");
-    navigator.clipboard.writeText(pre.innerText).then(() => {
-        const o = btn.textContent;
-        btn.textContent = "Copied!";
-        btn.style.color = "var(--green)";
-        setTimeout(() => { btn.textContent = o; btn.style.color = ""; }, 1500);
-    });
-}
-</script>
+  <div class="sh"><i class="fas fa-star" style="font-size:10px;color:var(--acc2)"></i> Fitur Unggulan</div>
+  <div class="feats">
+    <div class="feat" style="animation-delay:.1s" onclick="goPage('deploy')"><div class="feat-ico"><i class="fas fa-rocket"></i></div><div class="feat-t">Deploy ZIP</div><div class="feat-d">Upload file ZIP dan deploy langsung ke Netlify dengan subdomain pilihan.</div></div>
+    <div class="feat" style="animation-delay:.2s" onclick="goPage('clone')"><div class="feat-ico"><i class="fas fa-copy"></i></div><div class="feat-t">Clone Web</div><div class="feat-d">Download source code dari website manapun, tersimpan dalam ZIP siap pakai.</div></div>
+    <div class="feat" style="animation-delay:.3s" onclick="goPage('status')"><div class="feat-ico"><i class="fas fa-chart-line"></i></div><div class="feat-t">Monitoring</div><div class="feat-d">Pantau status server dan statistik penggunaan secara real-time.</div></div>
+    <div class="feat" style="animation-delay:.4s"><div class="feat-ico"><i class="fas fa-lock-open"></i></div><div class="feat-t">Tanpa Login</div><div class="feat-d">Tidak perlu daftar akun. Langsung pakai, langsung jalan. Semudah itu.</div></div>
+  </div>
+
+  <div class="sh"><i class="fas fa-fire" style="font-size:10px;color:var(--acc2)"></i> Statistik</div>
+  <div class="stats">
+    <div class="stat" style="animation-delay:.1s"><div class="stat-v" id="h-dep">—</div><div class="stat-k"><i class="fas fa-rocket" style="font-size:9px;margin-right:3px"></i>Deploy</div></div>
+    <div class="stat" style="animation-delay:.2s"><div class="stat-v" id="h-cln">—</div><div class="stat-k"><i class="fas fa-copy" style="font-size:9px;margin-right:3px"></i>Clone</div></div>
+    <div class="stat" style="animation-delay:.3s"><div class="stat-v" style="color:var(--gn);font-size:14px"><i class="fas fa-circle" style="font-size:8px;margin-right:4px"></i>ONLINE</div><div class="stat-k">API</div></div>
+  </div>
+
+  <div class="sh"><i class="fas fa-circle-question" style="font-size:10px;color:var(--acc2)"></i> FAQ</div>
+  <div class="faqs" id="faq-c"></div>
+
+  <div class="sh" style="margin-top:8px"><i class="fas fa-file-contract" style="font-size:10px;color:var(--acc2)"></i> Kebijakan</div>
+  <div class="ltabs">
+    <button class="ltab on" onclick="switchL(this,'lt')">Terms</button>
+    <button class="ltab" onclick="switchL(this,'lp')">Privacy</button>
+    <button class="ltab" onclick="switchL(this,'lc')">Cookie</button>
+  </div>
+  <div id="lt" class="lpanel on"><div class="lbox">
+    <h4><i class="fas fa-gavel" style="margin-right:5px"></i>Syarat Penggunaan</h4>
+    <p>Dengan menggunakan Soraa Deployment, kamu setuju tidak menyalahgunakan layanan untuk tujuan ilegal, menyebarkan malware, atau konten yang melanggar hukum.</p>
+    <h4><i class="fas fa-server" style="margin-right:5px"></i>Batasan Layanan</h4>
+    <p>Setiap pengguna dibatasi ukuran upload maksimal 50MB per file ZIP. Layanan gratis untuk penggunaan personal dan non-komersial.</p>
+    <h4><i class="fas fa-clock-rotate-left" style="margin-right:5px"></i>Perubahan Ketentuan</h4>
+    <p>Kami berhak mengubah syarat ini kapan saja. Perubahan akan diumumkan melalui channel Telegram @depstore11.</p>
+  </div></div>
+  <div id="lp" class="lpanel"><div class="lbox">
+    <h4><i class="fas fa-database" style="margin-right:5px"></i>Data yang Dikumpulkan</h4>
+    <p>Kami hanya menyimpan data statistik penggunaan (jumlah deploy dan clone) tanpa informasi identitas pribadi.</p>
+    <h4><i class="fas fa-file-zipper" style="margin-right:5px"></i>File yang Diunggah</h4>
+    <p>File ZIP yang kamu upload hanya diproses sementara dan tidak disimpan di server setelah proses selesai.</p>
+    <h4><i class="fas fa-envelope" style="margin-right:5px"></i>Kontak</h4>
+    <p>Pertanyaan soal privasi? Hubungi kami di Telegram: @depstore11</p>
+  </div></div>
+  <div id="lc" class="lpanel"><div class="lbox">
+    <h4><i class="fas fa-cookie-bite" style="margin-right:5px"></i>Penggunaan Cookie</h4>
+    <p>Soraa Deployment menggunakan cookie sesi yang bersifat teknis dan esensial agar aplikasi berjalan dengan baik.</p>
+    <h4><i class="fas fa-ban" style="margin-right:5px"></i>Tidak Ada Pelacakan</h4>
+    <p>Kami tidak menggunakan Google Analytics, Facebook Pixel, atau alat pelacakan iklan apapun.</p>
+  </div></div>
+
+  <div class="footer">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<div class="page" id="pg-deploy">
+<div class="app">
+  <div class="dep-hero">
+    <div class="dep-icon-wrap"><i class="fas fa-rocket"></i></div>
+    <div class="dep-title">Deploy Website</div>
+    <div class="dep-sub">Upload file ZIP dan deploy ke internet dalam detik</div>
+  </div>
+
+  <div class="step-track">
+    <div class="step-dot" id="dsd-0"><i class="fas fa-file-zipper" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-0"></div>
+    <div class="step-dot" id="dsd-1"><i class="fas fa-cloud-arrow-up" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-1"></div>
+    <div class="step-dot" id="dsd-2"><i class="fas fa-gears" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-2"></div>
+    <div class="step-dot" id="dsd-3"><i class="fas fa-circle-check" style="font-size:11px"></i></div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title"><i class="fas fa-sliders"></i> Konfigurasi Deploy</div>
+    <div class="inp-group">
+      <div class="inp-label"><i class="fas fa-at"></i> Subdomain</div>
+      <div class="inp-wrap">
+        <input class="finput" id="dep-dom" placeholder="contoh: namaweb" oninput="depDomainInput()"/>
+        <i class="fas fa-globe inp-icon"></i>
+      </div>
+      <div class="inp-hint" id="dep-dom-preview" style="display:none">
+        <i class="fas fa-link"></i> URL: <span class="hint-val" id="dep-dom-val"></span>.netlify.app
+      </div>
+    </div>
+    <div class="inp-group">
+      <div class="inp-label"><i class="fas fa-file-zipper"></i> File ZIP Website</div>
+      <div class="inp-wrap">
+        <input class="finput" type="file" id="dep-file" accept=".zip" onchange="depFileChange()"/>
+        <i class="fas fa-folder-open inp-icon" style="left:11px;top:50%;transform:translateY(-50%)"></i>
+      </div>
+      <div class="inp-hint" id="dep-file-info" style="display:none">
+        <i class="fas fa-circle-check" style="color:var(--gn)"></i> <span id="dep-file-name" class="hint-val"></span>
+      </div>
+    </div>
+    <button class="act-btn" id="dep-btn" onclick="doDeploy()">
+      <i class="fas fa-rocket"></i> Deploy Sekarang
+    </button>
+    <div class="err-box" id="dep-err"><i class="fas fa-circle-exclamation"></i><span id="dep-err-t"></span></div>
+  </div>
+
+  <div class="load-wrap" id="dep-load">
+    <div class="orbit"><div class="o1"></div><div class="o2"></div><div class="o3"></div><div class="odot"></div></div>
+    <div class="load-lbl" id="dep-load-lbl">DEPLOYING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="dep-prog"></div></div>
+    <div class="steps-list">
+      <div class="si" id="ds0"><i class="fas fa-file-zipper" style="font-size:9px"></i> Validasi file</div>
+      <div class="si" id="ds1"><i class="fas fa-cloud-arrow-up" style="font-size:9px"></i> Upload ke server</div>
+      <div class="si" id="ds2"><i class="fas fa-box-open" style="font-size:9px"></i> Setup site</div>
+      <div class="si" id="ds3"><i class="fas fa-server" style="font-size:9px"></i> Deploy ke Netlify</div>
+    </div>
+  </div>
+
+  <div class="res-box" id="dep-res">
+    <div class="res-lbl"><i class="fas fa-circle-check" style="color:var(--gn);margin-right:5px"></i>Website Live!</div>
+    <a class="res-url" id="dep-res-url" href="#" target="_blank">
+      <i class="fas fa-link" style="font-size:11px"></i><span id="dep-res-txt"></span>
+    </a>
+    <div class="res-info" id="dep-res-info"></div>
+    <div class="res-actions">
+      <button class="res-action" onclick="copyUrl('dep-res-txt')"><i class="fas fa-copy"></i> Salin URL</button>
+      <button class="res-action" id="dep-open-btn"><i class="fas fa-arrow-up-right-from-square"></i> Buka</button>
+    </div>
+  </div>
+
+  <div class="hist-wrap" id="dep-hist-wrap" style="display:none">
+    <div class="sh" style="margin-bottom:10px"><i class="fas fa-clock-rotate-left" style="font-size:10px;color:var(--acc2)"></i> Riwayat Deploy</div>
+    <div id="dep-hist"></div>
+  </div>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<div class="page" id="pg-clone">
+<div class="app">
+  <div class="cln-hero">
+    <div class="cln-icon-wrap"><i class="fas fa-copy" style="color:#4ecdc4"></i></div>
+    <div class="cln-title">Clone Website</div>
+    <div class="cln-sub">Crawl dan download source code dari website manapun</div>
+  </div>
+
+  <div class="step-track">
+    <div class="step-dot" id="csd-0"><i class="fas fa-link" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-0"></div>
+    <div class="step-dot" id="csd-1"><i class="fas fa-spider" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-1"></div>
+    <div class="step-dot" id="csd-2"><i class="fas fa-images" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-2"></div>
+    <div class="step-dot" id="csd-3"><i class="fas fa-file-zipper" style="font-size:11px"></i></div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title" style="color:#4ecdc4"><i class="fas fa-globe"></i> URL Target</div>
+    <div class="inp-group">
+      <div class="inp-label" style="color:rgba(78,205,196,.7)"><i class="fas fa-link" style="color:#4ecdc4"></i> Alamat Website</div>
+      <div class="inp-wrap">
+        <input class="finput" id="cln-url" placeholder="https://example.com" oninput="clnUrlInput()" style="border-color:rgba(78,205,196,.2)"/>
+        <i class="fas fa-globe inp-icon"></i>
+      </div>
+      <div class="url-preview" id="url-prev">
+        <div class="url-prev-domain" id="url-prev-domain"></div>
+        <div class="url-prev-full" id="url-prev-full"></div>
+      </div>
+    </div>
+    <div class="inp-group">
+      <div class="inp-label" style="color:rgba(78,205,196,.7)"><i class="fas fa-sliders" style="color:#4ecdc4"></i> Opsi Clone</div>
+      <div class="opt-grid">
+        <label class="opt-item"><input type="checkbox" id="opt-css" checked><span>CSS & Style</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-js" checked><span>JavaScript</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-img" checked><span>Gambar</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-font"><span>Font & Ikon</span></label>
+      </div>
+    </div>
+    <button class="act-btn cln-btn" id="cln-btn" onclick="doClone()">
+      <i class="fas fa-download"></i> Get Source Code
+    </button>
+    <div class="err-box" id="cln-err"><i class="fas fa-circle-exclamation"></i><span id="cln-err-t"></span></div>
+  </div>
+
+  <div class="load-wrap" id="cln-load">
+    <div class="orbit">
+      <div class="o1" style="border-top-color:#4ecdc4"></div>
+      <div class="o2" style="border-top-color:#1d9e75"></div>
+      <div class="o3" style="border-top-color:#5DCAA5"></div>
+      <div class="odot" style="background:#4ecdc4"></div>
+    </div>
+    <div class="load-lbl" style="color:#4ecdc4" id="cln-load-lbl">CLONING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="cln-prog" style="background:linear-gradient(90deg,#1d9e75,#4ecdc4)"></div></div>
+    <div class="steps-list">
+      <div class="si" id="cs0"><i class="fas fa-plug" style="font-size:9px"></i> Koneksi ke server</div>
+      <div class="si" id="cs1"><i class="fas fa-spider" style="font-size:9px"></i> Crawling halaman</div>
+      <div class="si" id="cs2"><i class="fas fa-images" style="font-size:9px"></i> Download aset</div>
+      <div class="si" id="cs3"><i class="fas fa-box-archive" style="font-size:9px"></i> Packing ZIP</div>
+    </div>
+  </div>
+
+  <div class="res-box cln-res" id="cln-res">
+    <div class="res-lbl"><i class="fas fa-circle-check" style="color:#4ecdc4;margin-right:5px"></i>Clone Selesai!</div>
+    <a class="res-url cln-url" id="cln-res-url" href="#" download>
+      <i class="fas fa-file-zipper" style="font-size:11px"></i><span id="cln-res-txt">file.zip</span>
+    </a>
+    <div class="res-info" id="cln-res-info"></div>
+    <div class="res-actions">
+      <button class="res-action cln-raction" id="cln-dl-btn"><i class="fas fa-download"></i> Download ZIP</button>
+      <button class="res-action cln-raction" onclick="doClone()"><i class="fas fa-rotate"></i> Clone Lagi</button>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<div class="page" id="pg-status">
+<div class="app">
+  <div class="dep-hero" style="padding-bottom:24px">
+    <div class="dep-icon-wrap" style="background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.3)">
+      <i class="fas fa-chart-line" style="color:var(--gn)"></i>
+    </div>
+    <div class="dep-title">Status & Statistik</div>
+    <div class="dep-sub">Pantau performa dan status API real-time</div>
+  </div>
+
+  <div class="stats" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-v" id="st-dep">—</div><div class="stat-k"><i class="fas fa-rocket" style="font-size:9px;margin-right:2px"></i>Deploy</div></div>
+    <div class="stat"><div class="stat-v" id="st-cln">—</div><div class="stat-k"><i class="fas fa-copy" style="font-size:9px;margin-right:2px"></i>Clone</div></div>
+    <div class="stat"><div class="stat-v" id="st-api" style="font-size:14px">—</div><div class="stat-k">API</div></div>
+  </div>
+
+  <div class="form-card" style="margin-bottom:14px">
+    <div class="fc-title"><i class="fas fa-clock"></i> Session Runtime</div>
+    <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--acc2)" id="st-rt">0j 0m 0d</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">Sesi dimulai sejak halaman dibuka</div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title"><i class="fas fa-server"></i> Endpoint Status</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-rocket" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/deploy</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-copy" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/clone</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-star" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/rating</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="act-btn" onclick="fetchStatus()" style="margin-top:0">
+    <i class="fas fa-rotate"></i> Refresh Status
+  </button>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<div id="toast"></div>
+<script src="/app.js"></script>
 </body>
 </html>
