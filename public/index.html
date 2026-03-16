@@ -3,233 +3,951 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Soraa deployment</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<title>Soraa Deployment</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/style.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06060d;--s1:#0d0d18;--s2:#13131f;--s3:#1a1a28;
+  --acc:#7c6ef7;--acc2:#a78bfa;--acc3:#c4b5fd;
+  --tx:#ffffff;--mu:#9896b8;--bd:rgba(124,110,247,.18);
+  --gn:#4ade80;--rd:#f87171;--yw:#fbbf24;
+}
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.05;transform:scale(1)}to{opacity:.95;transform:scale(1.8)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}50%{box-shadow:0 0 0 8px rgba(74,222,128,0)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes popIn{0%{opacity:0;transform:scale(.85)}70%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+@keyframes borderGlow{0%,100%{border-color:rgba(124,110,247,.18)}50%{border-color:rgba(124,110,247,.5)}}
+@keyframes pageSlideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glow{0%,100%{opacity:.3}50%{opacity:.7}}
+
+/* HAMBURGER */
+#ham{
+  position:fixed;top:16px;right:16px;z-index:1000;
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(124,110,247,.16);border:1px solid rgba(124,110,247,.3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .3s;font-size:18px;color:var(--acc2);
+}
+#ham:hover{background:rgba(124,110,247,.28);transform:scale(1.08)}
+#ham.open{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.35);color:#f87171}
+
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;opacity:0;pointer-events:none;transition:opacity .4s;backdrop-filter:blur(2px)}
+#overlay.show{opacity:1;pointer-events:all}
+
+#drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(360px,90vw);z-index:900;
+  background:var(--s1);border-left:1px solid var(--bd);
+  transform:translateX(110%);transition:transform .5s cubic-bezier(.16,1,.3,1);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+#drawer.open{transform:translateX(0)}
+
+.dr-header{padding:20px 18px 16px;border-bottom:1px solid var(--bd)}
+.dr-brand{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:14px}
+.dr-brand span{background:linear-gradient(135deg,var(--acc3),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.clock-box{background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:10px;animation:borderGlow 3s ease-in-out infinite}
+.clk-time{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:2px;line-height:1}
+.clk-date{font-size:11px;color:var(--mu);margin-top:4px}
+.clk-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.clk-badge{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;background:rgba(124,110,247,.2);border:1px solid rgba(124,110,247,.3);color:var(--acc2);padding:2px 8px;border-radius:20px}
+.online-dot{width:6px;height:6px;background:var(--gn);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+
+.wx-box{background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.wx-icon{font-size:32px;line-height:1;animation:float 3s ease-in-out infinite}
+.wx-temp{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff}
+.wx-desc{font-size:11px;color:var(--mu);margin-top:3px}
+.wx-loc{font-size:10px;color:rgba(152,150,184,.6);margin-top:2px}
+.wx-loading{font-size:11px;color:var(--mu)}
+
+.dr-nav{padding:12px 10px;display:flex;flex-direction:column;gap:3px;flex:1}
+.dr-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all .25s;text-decoration:none;color:var(--tx);position:relative;overflow:hidden}
+.dr-item::before{content:'';position:absolute;inset:0;background:rgba(124,110,247,.08);transform:scaleX(0);transform-origin:left;transition:transform .3s;border-radius:12px}
+.dr-item:hover::before{transform:scaleX(1)}
+.dr-item:hover{color:#fff;transform:translateX(4px)}
+.dr-item.active{background:rgba(124,110,247,.15);border:1px solid rgba(124,110,247,.25);color:#fff}
+.dr-ico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(124,110,247,.12);border:1px solid rgba(124,110,247,.2);font-size:15px;color:var(--acc2);transition:all .3s}
+.dr-item:hover .dr-ico,.dr-item.active .dr-ico{background:rgba(124,110,247,.25);transform:scale(1.1)}
+.dr-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff}
+.dr-sub{font-size:11px;color:var(--mu);margin-top:1px}
+.dr-badge{margin-left:auto;font-size:9px;font-weight:700;letter-spacing:.5px;background:rgba(124,110,247,.2);border:1px solid rgba(124,110,247,.3);color:var(--acc2);padding:2px 8px;border-radius:20px;flex-shrink:0}
+.dr-sep{height:1px;background:var(--bd);margin:6px 14px}
+
+/* BOTTOM NAV */
+#bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:700;background:rgba(6,6,13,.92);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-around;padding:10px 0 14px;backdrop-filter:blur(12px)}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 18px;border-radius:10px;transition:all .25s;position:relative}
+.bnav-item::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--acc);border-radius:2px;transition:width .3s}
+.bnav-item.active::after{width:24px}
+.bnav-item .bi{font-size:20px;color:var(--mu);transition:all .3s}
+.bnav-item.active .bi{color:var(--acc2);transform:translateY(-2px)}
+.bnav-item span{font-size:10px;color:var(--mu);font-weight:600;letter-spacing:.5px;transition:color .3s}
+.bnav-item.active span{color:var(--acc2)}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 70px)}
+.page.active{display:block;animation:pageSlideIn .4s cubic-bezier(.16,1,.3,1) both}
+.app{max-width:520px;margin:0 auto;padding:28px 18px 90px;position:relative;z-index:1}
+
+/* HOME */
+.hero{text-align:center;padding:16px 0 40px}
+.logo-wrap{display:flex;justify-content:center;margin-bottom:20px;animation:float 4s ease-in-out infinite}
+.logo-glow{filter:drop-shadow(0 0 30px rgba(124,110,247,.5))}
+.tagline{font-family:'Syne',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);margin-bottom:8px;animation:fadeUp .8s .15s both}
+.brand{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;background:linear-gradient(90deg,#c4b5fd,#a78bfa,#818cf8,#c4b5fd);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .8s .2s both,shimmer 4s linear infinite;margin-bottom:14px}
+.hero-desc{font-size:13px;color:var(--mu);line-height:1.75;max-width:380px;margin:0 auto 22px;animation:fadeUp .8s .3s both}
+.pills{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:26px;animation:fadeUp .8s .35s both}
+.pill{background:rgba(124,110,247,.1);border:1px solid rgba(124,110,247,.22);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:600;color:var(--acc2);transition:all .25s;cursor:default}
+.pill:hover{background:rgba(124,110,247,.22);transform:translateY(-2px)}
+.cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;animation:fadeUp .8s .4s both}
+.btn-main{padding:13px 28px;border-radius:12px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;background:linear-gradient(135deg,var(--acc),#818cf8);color:#fff;transition:all .3s;position:relative;overflow:hidden}
+.btn-main::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s}
+.btn-main:hover::after{transform:translateX(100%)}
+.btn-main:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(124,110,247,.45)}
+.btn-out{padding:13px 28px;border-radius:12px;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:transparent;border:1px solid rgba(124,110,247,.35);color:var(--acc2);transition:all .3s}
+.btn-out:hover{background:rgba(124,110,247,.15);transform:translateY(-3px)}
+
+.join-banner{display:flex;align-items:center;gap:12px;background:rgba(124,110,247,.08);border:1px solid var(--bd);border-radius:14px;padding:13px 16px;margin-bottom:36px;cursor:pointer;transition:all .3s;text-decoration:none;animation:fadeUp .8s .45s both}
+.join-banner:hover{background:rgba(124,110,247,.16);border-color:rgba(124,110,247,.4);transform:translateY(-2px)}
+.jdot{width:8px;height:8px;background:var(--gn);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+.jtx{flex:1}
+.jt{font-size:13px;font-weight:600;color:#fff}
+.js{font-size:11px;color:var(--mu);margin-top:1px}
+
+.sh{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-bottom:14px}
+.sh::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:44px}
+.feat{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px;transition:all .35s;cursor:pointer;position:relative;overflow:hidden;animation:fadeUp .8s both}
+.feat::before{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 0,rgba(124,110,247,.15),transparent 70%);transition:opacity .3s}
+.feat:hover::before{opacity:1}
+.feat:hover{border-color:rgba(124,110,247,.4);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.feat-ico{width:42px;height:42px;border-radius:11px;background:rgba(124,110,247,.12);border:1px solid rgba(124,110,247,.22);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;color:var(--acc2);transition:all .3s}
+.feat:hover .feat-ico{background:rgba(124,110,247,.25);transform:scale(1.1) rotate(-5deg)}
+.feat-t{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:5px}
+.feat-d{font-size:11px;color:var(--mu);line-height:1.65}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:44px}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px 10px;text-align:center;transition:all .3s;animation:popIn .5s both}
+.stat:hover{border-color:rgba(124,110,247,.35);transform:scale(1.03)}
+.stat-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--acc2)}
+.stat-k{font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+.faqs{margin-bottom:44px}
+.faq-item{border:1px solid var(--bd);border-radius:14px;margin-bottom:8px;overflow:hidden;background:var(--s1);transition:border-color .3s;animation:fadeUp .6s both}
+.faq-item:hover{border-color:rgba(124,110,247,.3)}
+.faq-q{padding:15px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:600;color:#fff;transition:background .2s;user-select:none}
+.faq-q:hover{background:rgba(124,110,247,.06)}
+.faq-qi{font-size:15px;color:var(--acc2);flex-shrink:0;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.faq-item.open .faq-qi{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.16,1,.3,1)}
+.faq-item.open .faq-a{max-height:250px}
+.faq-in{padding:12px 18px 14px;font-size:12px;color:var(--mu);line-height:1.75;border-top:1px solid var(--bd)}
+
+.ltabs{display:flex;gap:6px;margin-bottom:12px}
+.ltab{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--mu);background:transparent;transition:all .25px}
+.ltab.on{background:rgba(124,110,247,.15);border-color:rgba(124,110,247,.35);color:var(--acc2)}
+.lpanel{display:none;animation:fadeUp .3s both}
+.lpanel.on{display:block}
+.lbox{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px;font-size:12px;color:var(--mu);line-height:1.8}
+.lbox h4{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--acc2);margin:14px 0 6px}
+.lbox h4:first-child{margin-top:0}
+.lbox p{margin-bottom:10px}
+.lbox p:last-child{margin-bottom:0}
+
+/* ---- FORM STYLES (fixed) ---- */
+.dep-hero{text-align:center;padding:24px 0 32px;animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both}
+.dep-icon-wrap{width:80px;height:80px;border-radius:22px;margin:0 auto 18px;background:rgba(124,110,247,.12);border:1px solid rgba(124,110,247,.28);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--acc2);animation:float 3.5s ease-in-out infinite}
+.dep-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:8px}
+.dep-sub{font-size:13px;color:var(--mu)}
+
+.step-track{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:24px;animation:fadeUp .5s both}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1.5px solid rgba(124,110,247,.25);color:var(--mu);transition:all .4s;background:var(--s2)}
+.step-dot.done{background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.5);color:var(--gn)}
+.step-dot.active{background:rgba(124,110,247,.18);border-color:var(--acc);color:var(--acc2);animation:borderGlow 2s infinite}
+.step-line{flex:1;height:1px;background:var(--bd);max-width:40px;transition:background .4s}
+.step-line.done{background:rgba(74,222,128,.4)}
+
+.form-card{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:22px;margin-bottom:14px;animation:fadeUp .6s .15s both;transition:border-color .3s}
+.form-card:hover{border-color:rgba(124,110,247,.28)}
+.fc-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.fc-title i{color:var(--acc2);font-size:14px}
+
+/* FIXED input group */
+.inp-group{margin-bottom:14px}
+.inp-group:last-of-type{margin-bottom:0}
+.inp-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--mu);margin-bottom:7px;
+}
+.inp-label i{font-size:10px;color:var(--acc2)}
+.inp-wrap{position:relative;display:flex;align-items:center}
+.inp-icon{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:13px;color:var(--mu);pointer-events:none;z-index:1;
+  transition:color .25s;
+}
+.finput{
+  width:100%;background:var(--s2);
+  border:1.5px solid rgba(124,110,247,.2);
+  border-radius:11px;
+  padding:13px 13px 13px 40px;
+  color:#fff;
+  font-size:13px;
+  font-family:'Space Grotesk',sans-serif;
+  outline:none;
+  transition:all .25s;
+  line-height:1.4;
+}
+.finput:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(124,110,247,.1)}
+.finput:focus + .inp-icon,
+.inp-wrap:focus-within .inp-icon{color:var(--acc2)}
+.finput::placeholder{color:rgba(152,150,184,.5);font-size:12px}
+.finput[type=file]{cursor:pointer;padding:11px 13px 11px 40px}
+.finput[type=file]::file-selector-button{
+  background:rgba(124,110,247,.14);
+  border:1px solid rgba(124,110,247,.28);
+  color:var(--acc2);padding:5px 12px;border-radius:7px;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;
+  margin-right:10px;transition:background .2s;
+}
+.finput[type=file]::file-selector-button:hover{background:rgba(124,110,247,.25)}
+.inp-hint{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;color:rgba(152,150,184,.6);margin-top:6px;padding-left:2px;
+}
+.inp-hint i{font-size:10px;color:var(--acc2)}
+.inp-hint .hint-val{color:var(--acc2);font-weight:600}
+
+/* checkbox options */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
+.opt-item{
+  display:flex;align-items:center;gap:9px;
+  background:var(--s2);border:1.5px solid rgba(124,110,247,.15);
+  border-radius:10px;padding:10px 12px;cursor:pointer;
+  transition:all .25s;user-select:none;
+}
+.opt-item:hover{border-color:rgba(124,110,247,.3);background:rgba(124,110,247,.06)}
+.opt-item input[type=checkbox]{
+  width:15px;height:15px;accent-color:var(--acc);
+  cursor:pointer;flex-shrink:0;
+}
+.opt-item span{font-size:11px;color:var(--mu);transition:color .25s}
+.opt-item:has(input:checked){border-color:rgba(124,110,247,.35);background:rgba(124,110,247,.08)}
+.opt-item:has(input:checked) span{color:var(--acc2)}
+
+.act-btn{
+  width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;
+  margin-top:18px;position:relative;overflow:hidden;transition:all .3s;
+  background:linear-gradient(135deg,var(--acc),#818cf8);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.act-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 32px rgba(124,110,247,.45)}
+.act-btn:active:not(:disabled){transform:translateY(0)}
+.act-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.act-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);transform:translateX(-100%);transition:transform .4s}
+.act-btn:hover:not(:disabled)::before{transform:translateX(100%)}
+
+.load-wrap{display:none;flex-direction:column;align-items:center;gap:14px;padding:24px;background:rgba(7,7,14,.5);border-radius:14px;margin-top:16px;border:1px solid var(--bd)}
+.load-wrap.show{display:flex}
+.orbit{width:56px;height:56px;position:relative}
+.o1,.o2,.o3{position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--acc);border-radius:50%}
+.o1{animation:spin 1s linear infinite}
+.o2{inset:8px;border-top-color:var(--acc2);animation:spin 1.5s linear infinite reverse}
+.o3{inset:16px;border-top-color:var(--acc3);animation:spin .8s linear infinite}
+.odot{position:absolute;inset:24px;background:var(--acc);border-radius:50%;animation:glow 1.5s ease-in-out infinite}
+.load-lbl{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--acc2);letter-spacing:1.5px}
+.prog-wrap{width:100%;background:rgba(124,110,247,.1);border-radius:20px;height:4px;overflow:hidden;margin-top:4px}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2),var(--acc3));border-radius:20px;width:0;transition:width .4s ease}
+.steps-list{display:flex;flex-direction:column;gap:5px;width:100%;max-width:200px}
+.si{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:7px;padding:2px 0;transition:color .3s}
+.si::before{content:'◇';font-size:9px;flex-shrink:0;transition:all .3s}
+.si.active{color:var(--acc2)}.si.active::before{content:'◈';color:var(--acc2)}
+.si.done{color:var(--gn)}.si.done::before{content:'✦';color:var(--gn)}
+
+.res-box{display:none;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.22);border-radius:12px;padding:16px;margin-top:14px;animation:popIn .4s both}
+.res-lbl{font-size:10px;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.res-url{font-size:13px;color:var(--gn);font-weight:600;word-break:break-all;text-decoration:none;display:flex;align-items:center;gap:6px}
+.res-url:hover{text-decoration:underline}
+.res-info{font-size:11px;color:var(--mu);margin-top:5px}
+.res-actions{display:flex;gap:8px;margin-top:12px}
+.res-action{flex:1;padding:9px;border-radius:9px;border:1px solid rgba(74,222,128,.25);background:transparent;color:var(--gn);font-size:11px;font-weight:600;cursor:pointer;transition:all .25s;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.res-action:hover{background:rgba(74,222,128,.12)}
+
+.err-box{display:none;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.22);border-radius:10px;padding:11px 14px;margin-top:10px;font-size:12px;color:var(--rd);animation:fadeUp .3s both;align-items:center;gap:8px}
+.err-box.show{display:flex}
+
+.hist-wrap{margin-top:20px;animation:fadeUp .6s .3s both}
+.hist-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--s1);border:1px solid var(--bd);border-radius:11px;margin-bottom:6px;transition:all .25s;cursor:pointer}
+.hist-item:hover{border-color:rgba(124,110,247,.3);transform:translateX(3px)}
+.hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--gn)}
+.hist-url{font-size:12px;color:var(--acc2);font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-time{font-size:10px;color:var(--mu)}
+
+/* Clone */
+.cln-hero{text-align:center;padding:24px 0 32px;animation:fadeUp .6s both}
+.cln-icon-wrap{width:80px;height:80px;border-radius:22px;margin:0 auto 18px;background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.28);display:flex;align-items:center;justify-content:center;font-size:32px;color:#4ecdc4;animation:float 3.5s ease-in-out .5s infinite}
+.cln-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:8px}
+.cln-sub{font-size:13px;color:var(--mu)}
+.cln-btn{background:linear-gradient(135deg,#1d9e75,#4ecdc4)}
+.cln-btn:hover:not(:disabled){box-shadow:0 10px 32px rgba(78,205,196,.35)}
+.cln-res{background:rgba(78,205,196,.07);border-color:rgba(78,205,196,.22)}
+.cln-url{color:#4ecdc4}
+.cln-raction{border-color:rgba(78,205,196,.25);color:#4ecdc4}
+.cln-raction:hover{background:rgba(78,205,196,.12)}
+
+.url-preview{background:var(--s2);border:1px solid rgba(124,110,247,.2);border-radius:10px;padding:10px 14px;margin-top:8px;display:none;animation:fadeUp .3s both;display:none}
+.url-prev-domain{font-size:13px;color:#fff;font-weight:600}
+.url-prev-full{font-size:10px;color:var(--mu);margin-top:3px;word-break:break-all}
+
+/* Status */
+.footer{text-align:center;margin-top:40px;font-size:11px;color:var(--mu);letter-spacing:.4px}
+.footer a{color:var(--acc2);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px 20px;font-size:12px;font-weight:600;color:#fff;z-index:9999;transition:all .4s cubic-bezier(.16,1,.3,1);opacity:0;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
 </head>
 <body>
 
-<div class="star-field" id="stars"></div>
+<div id="stars"></div>
 
-<div class="app">
+<button id="ham" onclick="toggleDrawer()">
+  <i id="ham-ico" class="fas fa-bars"></i>
+</button>
 
-    <div class="logo-wrap">
-        <svg class="logo" width="110" height="110" viewBox="0 0 120 120" fill="none">
-            <defs>
-                <radialGradient id="gC" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#c4b5fd"/>
-                    <stop offset="100%" stop-color="#7c6ef7"/>
-                </radialGradient>
-                <radialGradient id="gO" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#7c6ef7" stop-opacity="0.25"/>
-                    <stop offset="100%" stop-color="#7c6ef7" stop-opacity="0"/>
-                </radialGradient>
-            </defs>
-            <circle cx="60" cy="60" r="58" fill="url(#gO)"/>
-            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(124,110,247,0.18)" stroke-width="0.8" stroke-dasharray="3 4"/>
-            <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(124,110,247,0.28)" stroke-width="0.8" stroke-dasharray="5 3"/>
-            <circle cx="60" cy="60" r="30" fill="none" stroke="rgba(124,110,247,0.38)" stroke-width="0.8"/>
-            <circle cx="60" cy="60" r="18" fill="url(#gC)"/>
-            <circle cx="60" cy="60" r="8"  fill="#09090f"/>
-            <path d="M60 6L67 25L60 20L53 25Z"     fill="#7c6ef7"/>
-            <path d="M60 114L53 95L60 100L67 95Z"   fill="#7c6ef7"/>
-            <path d="M6 60L25 53L20 60L25 67Z"      fill="#7c6ef7"/>
-            <path d="M114 60L95 67L100 60L95 53Z"   fill="#7c6ef7"/>
-            <circle cx="60"  cy="14"  r="3.5" fill="#c4b5fd"/>
-            <circle cx="60"  cy="106" r="3.5" fill="#c4b5fd"/>
-            <circle cx="14"  cy="60"  r="3.5" fill="#c4b5fd"/>
-            <circle cx="106" cy="60"  r="3.5" fill="#c4b5fd"/>
-            <circle cx="21"  cy="21"  r="2"   fill="#7c6ef7" opacity="0.55"/>
-            <circle cx="99"  cy="21"  r="2"   fill="#7c6ef7" opacity="0.55"/>
-            <circle cx="21"  cy="99"  r="2"   fill="#7c6ef7" opacity="0.55"/>
-            <circle cx="99"  cy="99"  r="2"   fill="#7c6ef7" opacity="0.55"/>
-        </svg>
+<div id="overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="dr-header">
+    <div class="dr-brand"><i class="fas fa-satellite-dish" style="font-size:16px;margin-right:8px;color:var(--acc2)"></i>Soraa <span>deployment</span></div>
+    <div class="clock-box">
+      <div class="clk-time" id="clk">--:--:--</div>
+      <div class="clk-date" id="clkd">Memuat...</div>
+      <div class="clk-row"><div class="online-dot"></div><div class="clk-badge">WIB — UTC+7</div></div>
     </div>
-
-    <div class="tagline">Web Automation Tool</div>
-    <div class="brand">Soraa deployment</div>
-
-    <div class="pills">
-        <span class="pill">Deploy</span>
-        <span class="pill">Clone</span>
-        <span class="pill">Netlify</span>
-        <span class="pill">Free</span>
+    <div class="wx-box">
+      <div class="wx-icon" id="wx-ico"><i class="fas fa-sun" style="color:#fbbf24;font-size:28px"></i></div>
+      <div>
+        <div id="wx-temp-area"><span class="wx-loading"><i class="fas fa-circle-notch fa-spin"></i> Memuat cuaca...</span></div>
+        <div class="wx-desc" id="wx-desc" style="display:none"></div>
+        <div class="wx-loc"><i class="fas fa-location-dot" style="font-size:9px;margin-right:3px"></i>Surabaya, Jawa Timur</div>
+      </div>
     </div>
-
-    <a class="join-banner" href="https://t.me/depstore11" target="_blank" rel="noopener">
-        <div class="join-dot"></div>
-        <div class="join-text">
-            <div class="join-title">Wajib Join Channel</div>
-            <div class="join-sub">@depstore11 — Update &amp; info terbaru</div>
-        </div>
-        <div class="join-arrow">&#8599;</div>
+  </div>
+  <nav class="dr-nav">
+    <div class="dr-item active" onclick="goPage('home');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-house"></i></div>
+      <div><div class="dr-lbl">Beranda</div><div class="dr-sub">Info & panduan</div></div>
+    </div>
+    <div class="dr-item" onclick="goPage('deploy');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-rocket"></i></div>
+      <div><div class="dr-lbl">Deploy Web</div><div class="dr-sub">ZIP → Surge/Netlify</div></div>
+      <div class="dr-badge">FREE</div>
+    </div>
+    <div class="dr-item" onclick="goPage('clone');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-copy"></i></div>
+      <div><div class="dr-lbl">Clone Website</div><div class="dr-sub">Download source code</div></div>
+      <div class="dr-badge">FREE</div>
+    </div>
+    <div class="dr-sep"></div>
+    <a class="dr-item" href="https://t.me/depstore11" target="_blank">
+      <div class="dr-ico"><i class="fab fa-telegram"></i></div>
+      <div><div class="dr-lbl">Telegram Channel</div><div class="dr-sub">@depstore11</div></div>
     </a>
-
-    <div class="card" id="card-deploy">
-        <div class="card-header" onclick="toggle('card-deploy')">
-            <div class="icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                </svg>
-            </div>
-            <div class="card-info">
-                <div class="card-title">Deploy Web</div>
-                <div class="card-desc">Upload ZIP lalu deploy ke Netlify</div>
-            </div>
-            <div class="card-chevron">&#x2303;</div>
-        </div>
-        <div class="card-body">
-            <div class="card-inner">
-                <div class="loading-box" id="loading-deploy">
-                    <div class="orbit">
-                        <div class="or1"></div><div class="or2"></div>
-                        <div class="or3"></div><div class="orDot"></div>
-                    </div>
-                    <div class="load-label" id="load-deploy-label">Deploying...</div>
-                    <div class="step-list">
-                        <div class="sitem" id="sd0">Validasi input</div>
-                        <div class="sitem" id="sd1">Upload file</div>
-                        <div class="sitem" id="sd2">Ekstrak ZIP</div>
-                        <div class="sitem" id="sd3">Deploy ke Surge</div>
-                    </div>
-                </div>
-                <label>Subdomain</label>
-                <input type="text" id="deploy-domain" placeholder="namaweb (nama site netlify)"/>
-                <label>File ZIP</label>
-                <input type="file" id="deploy-file" accept=".zip"/>
-                <button class="btn" id="btn-deploy" onclick="startDeploy()">Deploy Sekarang</button>
-                <div class="result-box" id="result-deploy">
-                    <div class="res-label">Live URL</div>
-                    <a class="res-url" id="res-deploy-url" href="#" target="_blank"></a>
-                </div>
-                <div class="error-box" id="error-deploy"></div>
-            </div>
-        </div>
+    <div class="dr-item" onclick="goPage('status');closeDrawer()">
+      <div class="dr-ico"><i class="fas fa-chart-line"></i></div>
+      <div><div class="dr-lbl">Status & Statistik</div><div class="dr-sub">Pantau API</div></div>
     </div>
-
-    <div class="card" id="card-clone">
-        <div class="card-header" onclick="toggle('card-clone')">
-            <div class="icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/>
-                    <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
-                    <path d="M11 18H8a2 2 0 0 1-2-2V9"/>
-                </svg>
-            </div>
-            <div class="card-info">
-                <div class="card-title">Clone Web</div>
-                <div class="card-desc">Crawl &amp; download source website</div>
-            </div>
-            <div class="card-chevron">&#x2303;</div>
-        </div>
-        <div class="card-body">
-            <div class="card-inner">
-                <div class="loading-box" id="loading-clone">
-                    <div class="orbit">
-                        <div class="or1"></div><div class="or2"></div>
-                        <div class="or3"></div><div class="orDot"></div>
-                    </div>
-                    <div class="load-label">Cloning...</div>
-                    <div class="step-list">
-                        <div class="sitem" id="sc0">Koneksi ke server</div>
-                        <div class="sitem" id="sc1">Crawling halaman</div>
-                        <div class="sitem" id="sc2">Download assets</div>
-                        <div class="sitem" id="sc3">Packing ZIP</div>
-                    </div>
-                </div>
-                <label>URL Website</label>
-                <input type="text" id="clone-url" placeholder="https://example.com"/>
-                <button class="btn" id="btn-clone" onclick="startClone()">Get Source Code</button>
-                <div class="result-box" id="result-clone">
-                    <div class="res-label">Download ZIP</div>
-                    <a class="res-url" id="res-clone-url" href="#" download>Klik untuk download</a>
-                    <div class="res-info" id="res-clone-info"></div>
-                </div>
-                <div class="error-box" id="error-clone"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" id="card-status">
-        <div class="card-header" onclick="toggleStatus()">
-            <div class="icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-            </div>
-            <div class="card-info">
-                <div class="card-title">Status Server</div>
-                <div class="card-desc">Cek statistik &amp; runtime</div>
-            </div>
-            <div class="card-chevron">&#x2303;</div>
-        </div>
-        <div class="card-body">
-            <div class="card-inner">
-                <div class="status-grid">
-                    <div class="stat-card"><div class="stat-val" id="sv-deploy">0</div><div class="stat-key">Total Deploy</div></div>
-                    <div class="stat-card"><div class="stat-val" id="sv-clone">0</div><div class="stat-key">Total Clone</div></div>
-                    <div class="stat-card"><div class="stat-val" id="sv-rating">0</div><div class="stat-key">Total Rating</div></div>
-                    <div class="stat-card"><div class="stat-val" id="sv-online" style="color:#4ade80">Online</div><div class="stat-key">API Status</div></div>
-                </div>
-                <div class="runtime-box">
-                    <span class="runtime-label">Session Runtime</span>
-                    <span class="runtime-val" id="runtime-val">0j 0m 0d</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" id="card-rating">
-        <div class="card-header" onclick="toggle('card-rating')">
-            <div class="icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-            </div>
-            <div class="card-info">
-                <div class="card-title">Rating Layanan</div>
-                <div class="card-desc">Kirim testimoni ke channel Telegram</div>
-            </div>
-            <div class="card-chevron">&#x2303;</div>
-        </div>
-        <div class="card-body">
-            <div class="card-inner">
-                <label>Nama Kamu</label>
-                <input type="text" id="rating-name" placeholder="Nama atau username"/>
-                <label>Pilih Rating</label>
-                <div class="rating-row">
-                    <div class="star-btn" onclick="selectRating(1)">&#9733;</div>
-                    <div class="star-btn" onclick="selectRating(2)">&#9733;&#9733;</div>
-                    <div class="star-btn" onclick="selectRating(3)">&#9733;&#9733;&#9733;</div>
-                    <div class="star-btn" onclick="selectRating(4)">&#9733;&#9733;&#9733;&#9733;</div>
-                    <div class="star-btn" onclick="selectRating(5)">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-                <div class="stars-display" id="stars-display">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <label>Testimoni</label>
-                <textarea id="feedback" placeholder="Ceritakan pengalamanmu..."></textarea>
-                <button class="btn" id="btn-rating" onclick="submitRating()">Kirim Rating</button>
-                <div class="result-box" id="result-rating">
-                    <div class="res-label">Rating terkirim ke channel Telegram!</div>
-                </div>
-                <div class="error-box" id="error-rating"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <a href="/docs">API Docs</a>
-        &nbsp;&mdash;&nbsp;
-        Made with <span style="color:#a78bfa">&#9829;</span> by
-        <a href="https://t.me/depstore11" target="_blank">@depstore11</a>
-    </div>
-
+  </nav>
 </div>
 
-<div class="toast" id="toast"></div>
-<script src="/app.js"></script>
+<div id="bot-nav">
+  <div class="bnav-item active" id="bn-home" onclick="goPage('home')">
+    <i class="fas fa-house bi"></i><span>Home</span>
+  </div>
+  <div class="bnav-item" id="bn-deploy" onclick="goPage('deploy')">
+    <i class="fas fa-rocket bi"></i><span>Deploy</span>
+  </div>
+  <div class="bnav-item" id="bn-clone" onclick="goPage('clone')">
+    <i class="fas fa-copy bi"></i><span>Clone</span>
+  </div>
+  <div class="bnav-item" id="bn-status" onclick="goPage('status')">
+    <i class="fas fa-chart-line bi"></i><span>Status</span>
+  </div>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="pg-home">
+<div class="app">
+  <div class="hero">
+    <div class="logo-wrap">
+      <svg class="logo-glow" width="96" height="96" viewBox="0 0 120 120" fill="none">
+        <defs>
+          <radialGradient id="gC"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#7c6ef7"/></radialGradient>
+          <radialGradient id="gO"><stop offset="0%" stop-color="#7c6ef7" stop-opacity=".25"/><stop offset="100%" stop-color="#7c6ef7" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle cx="60" cy="60" r="58" fill="url(#gO)"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(124,110,247,.2)" stroke-width="1" stroke-dasharray="3 4"/>
+        <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(124,110,247,.3)" stroke-width="1" stroke-dasharray="5 3"/>
+        <circle cx="60" cy="60" r="30" fill="none" stroke="rgba(124,110,247,.4)" stroke-width="1"/>
+        <circle cx="60" cy="60" r="18" fill="url(#gC)"/>
+        <circle cx="60" cy="60" r="8" fill="#06060d"/>
+        <path d="M60 6L67 25L60 20L53 25Z" fill="#7c6ef7"/>
+        <path d="M60 114L53 95L60 100L67 95Z" fill="#7c6ef7"/>
+        <path d="M6 60L25 53L20 60L25 67Z" fill="#7c6ef7"/>
+        <path d="M114 60L95 67L100 60L95 53Z" fill="#7c6ef7"/>
+        <circle cx="60" cy="14" r="3.5" fill="#c4b5fd"/>
+        <circle cx="60" cy="106" r="3.5" fill="#c4b5fd"/>
+        <circle cx="14" cy="60" r="3.5" fill="#c4b5fd"/>
+        <circle cx="106" cy="60" r="3.5" fill="#c4b5fd"/>
+      </svg>
+    </div>
+    <div class="tagline">Web Automation Tool</div>
+    <div class="brand">Soraa deployment</div>
+    <p class="hero-desc">Deploy website kamu ke internet dalam hitungan detik. Upload ZIP, pilih subdomain, dan langsung live — gratis tanpa ribet.</p>
+    <div class="pills">
+      <span class="pill"><i class="fas fa-bolt" style="font-size:9px;margin-right:4px"></i>Deploy Instan</span>
+      <span class="pill"><i class="fas fa-copy" style="font-size:9px;margin-right:4px"></i>Clone Web</span>
+      <span class="pill"><i class="fas fa-gift" style="font-size:9px;margin-right:4px"></i>100% Gratis</span>
+      <span class="pill"><i class="fas fa-shield-halved" style="font-size:9px;margin-right:4px"></i>Aman</span>
+    </div>
+    <div class="cta-row">
+      <button class="btn-main" onclick="goPage('deploy')"><i class="fas fa-rocket"></i> Mulai Deploy</button>
+      <button class="btn-out" onclick="goPage('clone')"><i class="fas fa-copy"></i> Clone Website</button>
+    </div>
+  </div>
+
+  <a class="join-banner" href="https://t.me/depstore11" target="_blank">
+    <div class="jdot"></div>
+    <div class="jtx"><div class="jt">Wajib Join Channel</div><div class="js"><i class="fab fa-telegram" style="font-size:10px;margin-right:3px"></i>@depstore11 — Update & info terbaru</div></div>
+    <i class="fas fa-arrow-up-right-from-square" style="font-size:14px;color:var(--acc2)"></i>
+  </a>
+
+  <div class="sh"><i class="fas fa-star" style="font-size:10px;color:var(--acc2)"></i> Fitur Unggulan</div>
+  <div class="feats">
+    <div class="feat" style="animation-delay:.1s" onclick="goPage('deploy')"><div class="feat-ico"><i class="fas fa-rocket"></i></div><div class="feat-t">Deploy ZIP</div><div class="feat-d">Upload file ZIP dan deploy langsung ke Surge/Netlify dengan subdomain pilihan.</div></div>
+    <div class="feat" style="animation-delay:.2s" onclick="goPage('clone')"><div class="feat-ico"><i class="fas fa-copy"></i></div><div class="feat-t">Clone Web</div><div class="feat-d">Download source code dari website manapun, tersimpan dalam ZIP siap pakai.</div></div>
+    <div class="feat" style="animation-delay:.3s" onclick="goPage('status')"><div class="feat-ico"><i class="fas fa-chart-line"></i></div><div class="feat-t">Monitoring</div><div class="feat-d">Pantau status server dan statistik penggunaan secara real-time.</div></div>
+    <div class="feat" style="animation-delay:.4s"><div class="feat-ico"><i class="fas fa-lock-open"></i></div><div class="feat-t">Tanpa Login</div><div class="feat-d">Tidak perlu daftar akun. Langsung pakai, langsung jalan. Semudah itu.</div></div>
+  </div>
+
+  <div class="sh"><i class="fas fa-fire" style="font-size:10px;color:var(--acc2)"></i> Statistik</div>
+  <div class="stats">
+    <div class="stat" style="animation-delay:.1s"><div class="stat-v">1.2k+</div><div class="stat-k"><i class="fas fa-rocket" style="font-size:9px;margin-right:3px"></i>Deploy</div></div>
+    <div class="stat" style="animation-delay:.2s"><div class="stat-v">890+</div><div class="stat-k"><i class="fas fa-copy" style="font-size:9px;margin-right:3px"></i>Clone</div></div>
+    <div class="stat" style="animation-delay:.3s"><div class="stat-v" style="color:var(--gn);font-size:14px"><i class="fas fa-circle" style="font-size:8px;margin-right:4px"></i>ONLINE</div><div class="stat-k">API</div></div>
+  </div>
+
+  <div class="sh"><i class="fas fa-circle-question" style="font-size:10px;color:var(--acc2)"></i> FAQ</div>
+  <div class="faqs" id="faq-c"></div>
+
+  <div class="sh" style="margin-top:8px"><i class="fas fa-file-contract" style="font-size:10px;color:var(--acc2)"></i> Kebijakan</div>
+  <div class="ltabs">
+    <button class="ltab on" onclick="switchL(this,'lt')">Terms</button>
+    <button class="ltab" onclick="switchL(this,'lp')">Privacy</button>
+    <button class="ltab" onclick="switchL(this,'lc')">Cookie</button>
+  </div>
+  <div id="lt" class="lpanel on"><div class="lbox">
+    <h4><i class="fas fa-gavel" style="margin-right:5px"></i>Syarat Penggunaan</h4>
+    <p>Dengan menggunakan Soraa Deployment, kamu setuju tidak menyalahgunakan layanan untuk tujuan ilegal, menyebarkan malware, atau konten yang melanggar hukum.</p>
+    <h4><i class="fas fa-server" style="margin-right:5px"></i>Batasan Layanan</h4>
+    <p>Setiap pengguna dibatasi ukuran upload maksimal 50MB per file ZIP. Layanan gratis untuk penggunaan personal dan non-komersial.</p>
+    <h4><i class="fas fa-clock-rotate-left" style="margin-right:5px"></i>Perubahan Ketentuan</h4>
+    <p>Kami berhak mengubah syarat ini kapan saja. Perubahan akan diumumkan melalui channel Telegram @depstore11.</p>
+  </div></div>
+  <div id="lp" class="lpanel"><div class="lbox">
+    <h4><i class="fas fa-database" style="margin-right:5px"></i>Data yang Dikumpulkan</h4>
+    <p>Kami hanya menyimpan data statistik penggunaan (jumlah deploy dan clone) tanpa informasi identitas pribadi.</p>
+    <h4><i class="fas fa-file-zipper" style="margin-right:5px"></i>File yang Diunggah</h4>
+    <p>File ZIP yang kamu upload hanya diproses sementara dan tidak disimpan di server setelah proses selesai.</p>
+    <h4><i class="fas fa-envelope" style="margin-right:5px"></i>Kontak</h4>
+    <p>Pertanyaan soal privasi? Hubungi kami di Telegram: @depstore11</p>
+  </div></div>
+  <div id="lc" class="lpanel"><div class="lbox">
+    <h4><i class="fas fa-cookie-bite" style="margin-right:5px"></i>Penggunaan Cookie</h4>
+    <p>Soraa Deployment menggunakan cookie sesi yang bersifat teknis dan esensial agar aplikasi berjalan dengan baik.</p>
+    <h4><i class="fas fa-ban" style="margin-right:5px"></i>Tidak Ada Pelacakan</h4>
+    <p>Kami tidak menggunakan Google Analytics, Facebook Pixel, atau alat pelacakan iklan apapun.</p>
+  </div></div>
+
+  <div class="footer">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<!-- ===== DEPLOY ===== -->
+<div class="page" id="pg-deploy">
+<div class="app">
+  <div class="dep-hero">
+    <div class="dep-icon-wrap"><i class="fas fa-rocket"></i></div>
+    <div class="dep-title">Deploy Website</div>
+    <div class="dep-sub">Upload file ZIP dan deploy ke internet dalam detik</div>
+  </div>
+
+  <div class="step-track">
+    <div class="step-dot" id="dsd-0"><i class="fas fa-file-zipper" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-0"></div>
+    <div class="step-dot" id="dsd-1"><i class="fas fa-cloud-arrow-up" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-1"></div>
+    <div class="step-dot" id="dsd-2"><i class="fas fa-gears" style="font-size:11px"></i></div>
+    <div class="step-line" id="dsl-2"></div>
+    <div class="step-dot" id="dsd-3"><i class="fas fa-circle-check" style="font-size:11px"></i></div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title"><i class="fas fa-sliders"></i> Konfigurasi Deploy</div>
+
+    <div class="inp-group">
+      <div class="inp-label"><i class="fas fa-at"></i> Subdomain</div>
+      <div class="inp-wrap">
+        <input class="finput" id="dep-dom" placeholder="contoh: namaweb" oninput="depDomainInput()"/>
+        <i class="fas fa-globe inp-icon"></i>
+      </div>
+      <div class="inp-hint" id="dep-dom-preview" style="display:none">
+        <i class="fas fa-link"></i> URL: <span class="hint-val" id="dep-dom-val"></span>.surge.sh
+      </div>
+    </div>
+
+    <div class="inp-group">
+      <div class="inp-label"><i class="fas fa-file-zipper"></i> File ZIP Website</div>
+      <div class="inp-wrap">
+        <input class="finput" type="file" id="dep-file" accept=".zip" onchange="depFileChange()"/>
+        <i class="fas fa-folder-open inp-icon" style="left:11px;top:50%;transform:translateY(-50%)"></i>
+      </div>
+      <div class="inp-hint" id="dep-file-info" style="display:none">
+        <i class="fas fa-circle-check" style="color:var(--gn)"></i> <span id="dep-file-name" class="hint-val"></span>
+      </div>
+    </div>
+
+    <button class="act-btn" id="dep-btn" onclick="doDeploy()">
+      <i class="fas fa-rocket"></i> Deploy Sekarang
+    </button>
+    <div class="err-box" id="dep-err"><i class="fas fa-circle-exclamation"></i><span id="dep-err-t"></span></div>
+  </div>
+
+  <div class="load-wrap" id="dep-load">
+    <div class="orbit"><div class="o1"></div><div class="o2"></div><div class="o3"></div><div class="odot"></div></div>
+    <div class="load-lbl" id="dep-load-lbl">DEPLOYING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="dep-prog"></div></div>
+    <div class="steps-list">
+      <div class="si" id="ds0"><i class="fas fa-file-zipper" style="font-size:9px"></i> Validasi file</div>
+      <div class="si" id="ds1"><i class="fas fa-cloud-arrow-up" style="font-size:9px"></i> Upload ke server</div>
+      <div class="si" id="ds2"><i class="fas fa-box-open" style="font-size:9px"></i> Ekstrak ZIP</div>
+      <div class="si" id="ds3"><i class="fas fa-server" style="font-size:9px"></i> Deploy ke Surge</div>
+    </div>
+  </div>
+
+  <div class="res-box" id="dep-res">
+    <div class="res-lbl"><i class="fas fa-circle-check" style="color:var(--gn);margin-right:5px"></i>Website Live!</div>
+    <a class="res-url" id="dep-res-url" href="#" target="_blank">
+      <i class="fas fa-link" style="font-size:11px"></i><span id="dep-res-txt"></span>
+    </a>
+    <div class="res-info" id="dep-res-info"></div>
+    <div class="res-actions">
+      <button class="res-action" onclick="copyUrl('dep-res-txt')"><i class="fas fa-copy"></i> Salin URL</button>
+      <button class="res-action" id="dep-open-btn"><i class="fas fa-arrow-up-right-from-square"></i> Buka</button>
+    </div>
+  </div>
+
+  <div class="hist-wrap" id="dep-hist-wrap" style="display:none">
+    <div class="sh" style="margin-bottom:10px"><i class="fas fa-clock-rotate-left" style="font-size:10px;color:var(--acc2)"></i> Riwayat Deploy</div>
+    <div id="dep-hist"></div>
+  </div>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<!-- ===== CLONE ===== -->
+<div class="page" id="pg-clone">
+<div class="app">
+  <div class="cln-hero">
+    <div class="cln-icon-wrap"><i class="fas fa-copy" style="color:#4ecdc4"></i></div>
+    <div class="cln-title">Clone Website</div>
+    <div class="cln-sub">Crawl dan download source code dari website manapun</div>
+  </div>
+
+  <div class="step-track">
+    <div class="step-dot" id="csd-0"><i class="fas fa-link" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-0"></div>
+    <div class="step-dot" id="csd-1"><i class="fas fa-spider" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-1"></div>
+    <div class="step-dot" id="csd-2"><i class="fas fa-images" style="font-size:11px"></i></div>
+    <div class="step-line" id="csl-2"></div>
+    <div class="step-dot" id="csd-3"><i class="fas fa-file-zipper" style="font-size:11px"></i></div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title" style="color:#4ecdc4"><i class="fas fa-globe"></i> URL Target</div>
+
+    <div class="inp-group">
+      <div class="inp-label" style="color:rgba(78,205,196,.7)"><i class="fas fa-link" style="color:#4ecdc4"></i> Alamat Website</div>
+      <div class="inp-wrap">
+        <input class="finput" id="cln-url" placeholder="https://example.com" oninput="clnUrlInput()"
+          style="border-color:rgba(78,205,196,.2)"/>
+        <i class="fas fa-globe inp-icon"></i>
+      </div>
+      <div class="url-preview" id="url-prev">
+        <div class="url-prev-domain" id="url-prev-domain"></div>
+        <div class="url-prev-full" id="url-prev-full"></div>
+      </div>
+    </div>
+
+    <div class="inp-group">
+      <div class="inp-label" style="color:rgba(78,205,196,.7)"><i class="fas fa-sliders" style="color:#4ecdc4"></i> Opsi Clone</div>
+      <div class="opt-grid">
+        <label class="opt-item"><input type="checkbox" id="opt-css" checked><span>CSS & Style</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-js" checked><span>JavaScript</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-img" checked><span>Gambar</span></label>
+        <label class="opt-item"><input type="checkbox" id="opt-font"><span>Font & Ikon</span></label>
+      </div>
+    </div>
+
+    <button class="act-btn cln-btn" id="cln-btn" onclick="doClone()">
+      <i class="fas fa-download"></i> Get Source Code
+    </button>
+    <div class="err-box" id="cln-err"><i class="fas fa-circle-exclamation"></i><span id="cln-err-t"></span></div>
+  </div>
+
+  <div class="load-wrap" id="cln-load">
+    <div class="orbit">
+      <div class="o1" style="border-top-color:#4ecdc4"></div>
+      <div class="o2" style="border-top-color:#1d9e75"></div>
+      <div class="o3" style="border-top-color:#5DCAA5"></div>
+      <div class="odot" style="background:#4ecdc4"></div>
+    </div>
+    <div class="load-lbl" style="color:#4ecdc4" id="cln-load-lbl">CLONING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="cln-prog" style="background:linear-gradient(90deg,#1d9e75,#4ecdc4)"></div></div>
+    <div class="steps-list">
+      <div class="si" id="cs0"><i class="fas fa-plug" style="font-size:9px"></i> Koneksi ke server</div>
+      <div class="si" id="cs1"><i class="fas fa-spider" style="font-size:9px"></i> Crawling halaman</div>
+      <div class="si" id="cs2"><i class="fas fa-images" style="font-size:9px"></i> Download aset</div>
+      <div class="si" id="cs3"><i class="fas fa-box-archive" style="font-size:9px"></i> Packing ZIP</div>
+    </div>
+  </div>
+
+  <div class="res-box cln-res" id="cln-res">
+    <div class="res-lbl"><i class="fas fa-circle-check" style="color:#4ecdc4;margin-right:5px"></i>Clone Selesai!</div>
+    <a class="res-url cln-url" id="cln-res-url" href="#" download>
+      <i class="fas fa-file-zipper" style="font-size:11px"></i><span id="cln-res-txt">file.zip</span>
+    </a>
+    <div class="res-info" id="cln-res-info"></div>
+    <div class="res-actions">
+      <button class="res-action cln-raction" id="cln-dl-btn"><i class="fas fa-download"></i> Download ZIP</button>
+      <button class="res-action cln-raction" onclick="doClone()"><i class="fas fa-rotate"></i> Clone Lagi</button>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<!-- ===== STATUS ===== -->
+<div class="page" id="pg-status">
+<div class="app">
+  <div class="dep-hero" style="padding-bottom:24px">
+    <div class="dep-icon-wrap" style="background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.3)">
+      <i class="fas fa-chart-line" style="color:var(--gn)"></i>
+    </div>
+    <div class="dep-title">Status & Statistik</div>
+    <div class="dep-sub">Pantau performa dan status API real-time</div>
+  </div>
+
+  <div class="stats" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-v" id="st-dep">—</div><div class="stat-k"><i class="fas fa-rocket" style="font-size:9px;margin-right:2px"></i>Deploy</div></div>
+    <div class="stat"><div class="stat-v" id="st-cln">—</div><div class="stat-k"><i class="fas fa-copy" style="font-size:9px;margin-right:2px"></i>Clone</div></div>
+    <div class="stat"><div class="stat-v" id="st-api" style="font-size:14px">—</div><div class="stat-k">API</div></div>
+  </div>
+
+  <div class="form-card" style="margin-bottom:14px">
+    <div class="fc-title"><i class="fas fa-clock"></i> Session Runtime</div>
+    <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--acc2)" id="st-rt">0j 0m 0d</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">Sesi dimulai sejak halaman dibuka</div>
+  </div>
+
+  <div class="form-card">
+    <div class="fc-title"><i class="fas fa-server"></i> Endpoint Status</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-rocket" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/deploy</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-copy" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/clone</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <span style="font-size:12px;color:var(--mu)"><i class="fas fa-star" style="font-size:10px;margin-right:8px;color:var(--acc2)"></i>/api/rating</span>
+        <span style="font-size:10px;font-weight:700;color:var(--gn);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 10px;border-radius:20px"><i class="fas fa-circle" style="font-size:6px;margin-right:4px"></i>Online</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="act-btn" onclick="fetchStatus()" style="margin-top:0">
+    <i class="fas fa-rotate"></i> Refresh Status
+  </button>
+
+  <div class="footer" style="margin-top:24px">Made with <i class="fas fa-heart" style="color:#a78bfa;font-size:11px"></i> by <a href="https://t.me/depstore11" target="_blank">@depstore11</a></div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const sf=document.getElementById('stars');
+for(let i=0;i<80;i++){
+  const s=document.createElement('div');s.className='star';
+  const z=Math.random()*2.4+.3;
+  s.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*5}s;animation-delay:${-(Math.random()*7)}s`;
+  sf.appendChild(s);
+}
+
+function toggleDrawer(){
+  const open=document.getElementById('drawer').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show',open);
+  document.getElementById('ham').classList.toggle('open',open);
+  document.getElementById('ham-ico').className=open?'fas fa-xmark':'fas fa-bars';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('ham').classList.remove('open');
+  document.getElementById('ham-ico').className='fas fa-bars';
+}
+
+const pages=['home','deploy','clone','status'];
+function goPage(id){
+  pages.forEach(p=>{
+    document.getElementById('pg-'+p).classList.toggle('active',p===id);
+    document.getElementById('bn-'+p).classList.toggle('active',p===id);
+  });
+  document.querySelectorAll('.dr-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===pages.indexOf(id));
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='status')fetchStatus();
+}
+
+const startT=Date.now();
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clk').textContent=now.toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  document.getElementById('clkd').textContent=now.toLocaleDateString('id-ID',{timeZone:'Asia/Jakarta',weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const e=Date.now()-startT,j=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);
+  const rt=document.getElementById('st-rt');if(rt)rt.textContent=`${j}j ${m}m ${s}d`;
+}
+updateClock();setInterval(updateClock,1000);
+
+async function loadWeather(){
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=-7.2575&longitude=112.7521&current_weather=true&timezone=Asia%2FJakarta');
+    const d=await r.json();const cw=d.current_weather;const wc=cw.weathercode;
+    let ico='fa-cloud-rain',col='#60a5fa',desc='Hujan';
+    if(wc===0){ico='fa-sun';col='#fbbf24';desc='Cerah'}
+    else if(wc<=2){ico='fa-cloud-sun';col='#fbbf24';desc='Sebagian berawan'}
+    else if(wc<=3){ico='fa-cloud';col='#9896b8';desc='Mendung'}
+    else if(wc<=49){ico='fa-smog';col='#8b8aa8';desc='Berkabut'}
+    else if(wc<=69){ico='fa-cloud-rain';col='#60a5fa';desc='Hujan'}
+    else if(wc<=82){ico='fa-cloud-showers-heavy';col='#60a5fa';desc='Hujan deras'}
+    else if(wc<=99){ico='fa-cloud-bolt';col='#fbbf24';desc='Badai petir'}
+    document.getElementById('wx-ico').innerHTML=`<i class="fas ${ico}" style="color:${col};font-size:28px"></i>`;
+    document.getElementById('wx-temp-area').innerHTML=`<div class="wx-temp">${Math.round(cw.temperature)}°C</div>`;
+    const de=document.getElementById('wx-desc');
+    de.innerHTML=`${desc} <i class="fas fa-wind" style="font-size:9px;margin:0 2px"></i>${Math.round(cw.windspeed)} km/h`;
+    de.style.display='block';
+  }catch{document.getElementById('wx-temp-area').innerHTML='<span class="wx-loading">Gagal memuat</span>';}
+}
+loadWeather();
+
+const faqs=[
+  {q:'Apa itu Soraa Deployment?',a:'Soraa Deployment adalah tools gratis untuk deploy website statik ke Surge.sh/Netlify, serta clone source code dari website manapun. Upload ZIP → dalam detik website kamu langsung live.'},
+  {q:'Apakah benar-benar gratis?',a:'Ya, 100% gratis untuk penggunaan personal. Tidak ada biaya tersembunyi, tidak perlu kartu kredit.'},
+  {q:'Format file apa yang didukung?',a:'Hanya file .zip berisi website statik (HTML, CSS, JS, gambar). Pastikan file index.html ada di root folder ZIP.'},
+  {q:'Berapa lama proses deploy?',a:'Biasanya 10–30 detik, tergantung ukuran file dan kecepatan internet. Setelah selesai URL langsung aktif.'},
+  {q:'Berapa batas ukuran file?',a:'Maksimal 50MB per file ZIP. Untuk website lebih besar, optimalkan aset (kompres gambar, minify JS/CSS) terlebih dahulu.'},
+  {q:'Bagaimana fitur Clone Web bekerja?',a:'Masukkan URL target, sistem akan crawl dan mengunduh semua file lalu mengemasnya dalam ZIP yang bisa kamu download.'},
+];
+const fc=document.getElementById('faq-c');
+faqs.forEach((f,i)=>{
+  const d=document.createElement('div');d.className='faq-item';d.id='fq'+i;
+  d.innerHTML=`<div class="faq-q" onclick="tFaq(${i})"><span>${f.q}</span><i class="fas fa-plus faq-qi"></i></div><div class="faq-a"><div class="faq-in">${f.a}</div></div>`;
+  fc.appendChild(d);
+});
+function tFaq(i){document.getElementById('fq'+i).classList.toggle('open')}
+
+function switchL(btn,id){
+  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.lpanel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');document.getElementById(id).classList.add('on');
+}
+
+function toast(msg,col){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.color=col||'#a78bfa';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+function depDomainInput(){
+  const v=document.getElementById('dep-dom').value.trim();
+  const prev=document.getElementById('dep-dom-preview');
+  if(v){prev.style.display='flex';document.getElementById('dep-dom-val').textContent=v.toLowerCase().replace(/[^a-z0-9\-]/g,'');}
+  else prev.style.display='none';
+}
+function depFileChange(){
+  const f=document.getElementById('dep-file').files[0];
+  const info=document.getElementById('dep-file-info');
+  const name=document.getElementById('dep-file-name');
+  if(f){info.style.display='flex';name.textContent=f.name+' — '+(f.size/1024).toFixed(0)+' KB';}
+  else info.style.display='none';
+}
+function clnUrlInput(){
+  const v=document.getElementById('cln-url').value.trim();
+  const prev=document.getElementById('url-prev');
+  if(!v){prev.style.display='none';return;}
+  let url=v.startsWith('http')?v:'https://'+v;
+  try{
+    const u=new URL(url);
+    document.getElementById('url-prev-domain').textContent=u.hostname;
+    document.getElementById('url-prev-full').textContent=url;
+    prev.style.display='block';
+  }catch{prev.style.display='none';}
+}
+
+function setStepTrack(prefix,n,count){
+  for(let i=0;i<count;i++){
+    const d=document.getElementById(prefix+'d-'+i);
+    const l=document.getElementById(prefix+'l-'+i);
+    if(d)d.className='step-dot'+(i<n?' done':i===n?' active':'');
+    if(l&&i<count-1)l.className='step-line'+(i<n?' done':'');
+  }
+}
+
+function runSteps(sp,tp,count,ms){
+  return new Promise(res=>{
+    for(let i=0;i<count;i++){const s=document.getElementById(sp+i);if(s)s.className='si';}
+    const prog=document.getElementById(sp.replace('s','prog').slice(0,-1));
+    if(prog)prog.style.width='0%';
+    if(document.getElementById(sp+'0'))document.getElementById(sp+'0').className='si active';
+    setStepTrack(tp,0,count);
+    let i=0;
+    const iv=setInterval(()=>{
+      const prev=document.getElementById(sp+(i-1));if(prev)prev.className='si done';
+      i++;
+      const pct=Math.round((i/count)*100);
+      if(prog)prog.style.width=pct+'%';
+      if(i<count){const cur=document.getElementById(sp+i);if(cur)cur.className='si active';setStepTrack(tp,i,count);}
+      else{const last=document.getElementById(sp+(i-1));if(last)last.className='si done';setStepTrack(tp,count,count);clearInterval(iv);res();}
+    },ms||950);
+  });
+}
+
+const depHistory=[];
+async function doDeploy(){
+  const domain=document.getElementById('dep-dom').value.trim();
+  const file=document.getElementById('dep-file').files[0];
+  const err=document.getElementById('dep-err'),errT=document.getElementById('dep-err-t');
+  document.getElementById('dep-res').style.display='none';err.classList.remove('show');
+  if(!domain){errT.textContent='Subdomain wajib diisi';err.classList.add('show');return;}
+  if(!file){errT.textContent='Pilih file ZIP terlebih dahulu';err.classList.add('show');return;}
+  if(!file.name.endsWith('.zip')){errT.textContent='File harus berformat .zip';err.classList.add('show');return;}
+  document.getElementById('dep-btn').disabled=true;
+  document.getElementById('dep-load').classList.add('show');
+  const labels=['UPLOADING...','EXTRACTING...','DEPLOYING...','LIVE!'];
+  const lbl=document.getElementById('dep-load-lbl');let li=0;
+  const lv=setInterval(()=>{if(li<labels.length-1)lbl.textContent=labels[++li];},1200);
+  const sp=runSteps('ds','dep',4,1200);
+  const form=new FormData();
+  form.append('domain',domain.toLowerCase().replace(/[^a-z0-9\-]/g,''));
+  form.append('file',file);
+  try{
+    const r=await fetch('/api/deploy',{method:'POST',body:form});
+    const data=await r.json();await sp;clearInterval(lv);
+    document.getElementById('dep-load').classList.remove('show');
+    document.getElementById('dep-btn').disabled=false;
+    if(!r.ok||!data.ok){errT.textContent=data.error||'Deploy gagal';err.classList.add('show');toast('Deploy gagal','#f87171');return;}
+    const url=data.url;
+    document.getElementById('dep-res-url').href=url;
+    document.getElementById('dep-res-txt').textContent=url;
+    document.getElementById('dep-res-info').innerHTML=`<i class="fas fa-clock" style="font-size:9px;margin-right:4px"></i>Deployed ${new Date().toLocaleTimeString('id-ID')}`;
+    document.getElementById('dep-open-btn').onclick=()=>window.open(url,'_blank');
+    document.getElementById('dep-res').style.display='block';
+    depHistory.unshift({url,time:new Date().toLocaleTimeString('id-ID')});
+    renderDepHist();toast('Deploy sukses!','#4ade80');
+  }catch{
+    await sp;clearInterval(lv);
+    document.getElementById('dep-load').classList.remove('show');
+    document.getElementById('dep-btn').disabled=false;
+    errT.textContent='Koneksi gagal. Cek internet kamu.';err.classList.add('show');toast('Error!','#f87171');
+  }
+}
+function renderDepHist(){
+  const hw=document.getElementById('dep-hist-wrap');hw.style.display='block';
+  document.getElementById('dep-hist').innerHTML=depHistory.slice(0,5).map(h=>`<div class="hist-item" onclick="window.open('${h.url}','_blank')"><div class="hist-dot"></div><div class="hist-url">${h.url}</div><div class="hist-time">${h.time}</div></div>`).join('');
+}
+
+async function doClone(){
+  let url=document.getElementById('cln-url').value.trim();
+  const err=document.getElementById('cln-err'),errT=document.getElementById('cln-err-t');
+  document.getElementById('cln-res').style.display='none';err.classList.remove('show');
+  if(!url){errT.textContent='Masukkan URL website';err.classList.add('show');return;}
+  let target=url.startsWith('http')?url:'https://'+url;
+  try{new URL(target);}catch{errT.textContent='URL tidak valid';err.classList.add('show');return;}
+  document.getElementById('cln-btn').disabled=true;
+  document.getElementById('cln-load').classList.add('show');
+  const labels=['CONNECTING...','CRAWLING...','DOWNLOADING...','PACKING...'];
+  const lbl=document.getElementById('cln-load-lbl');let li=0;
+  const lv=setInterval(()=>{if(li<labels.length-1)lbl.textContent=labels[++li];},1400);
+  const sp=runSteps('cs','cln',4,1400);
+  try{
+    const r=await fetch('/api/clone',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:target})});
+    await sp;clearInterval(lv);
+    document.getElementById('cln-load').classList.remove('show');
+    document.getElementById('cln-btn').disabled=false;
+    if(!r.ok){const d=await r.json().catch(()=>({}));errT.textContent=d.error||'Clone gagal';err.classList.add('show');toast('Clone gagal','#f87171');return;}
+    const blob=await r.blob();
+    const domain=new URL(target).hostname;
+    const ou=URL.createObjectURL(blob);
+    document.getElementById('cln-res-url').href=ou;
+    document.getElementById('cln-res-txt').textContent=domain+'.zip';
+    document.getElementById('cln-res-info').innerHTML=`<i class="fas fa-weight-hanging" style="font-size:9px;margin-right:4px"></i>Ukuran: ${Math.round(blob.size/1024)} KB — ${new Date().toLocaleTimeString('id-ID')}`;
+    document.getElementById('cln-dl-btn').onclick=()=>{const a=document.createElement('a');a.href=ou;a.download=domain+'.zip';a.click();};
+    document.getElementById('cln-res').style.display='block';toast('Clone selesai!','#4ade80');
+  }catch{
+    await sp;clearInterval(lv);
+    document.getElementById('cln-load').classList.remove('show');
+    document.getElementById('cln-btn').disabled=false;
+    errT.textContent='Koneksi gagal. Cek internet kamu.';err.classList.add('show');toast('Error!','#f87171');
+  }
+}
+
+function copyUrl(id){
+  const t=document.getElementById(id);
+  if(t&&navigator.clipboard)navigator.clipboard.writeText(t.textContent).then(()=>toast('URL disalin!','#a78bfa'));
+}
+
+async function fetchStatus(){
+  document.getElementById('st-api').innerHTML='<i class="fas fa-circle-notch fa-spin" style="font-size:12px"></i>';
+  try{
+    const r=await fetch('/api/status');const d=await r.json();
+    document.getElementById('st-dep').textContent=d.deploy||'—';
+    document.getElementById('st-cln').textContent=d.clone||'—';
+    document.getElementById('st-api').innerHTML='<i class="fas fa-circle" style="font-size:10px;color:var(--gn)"></i>';
+  }catch{
+    document.getElementById('st-api').innerHTML='<i class="fas fa-circle" style="font-size:10px;color:var(--rd)"></i>';
+  }
+}
+fetchStatus();
+</script>
 </body>
 </html>
